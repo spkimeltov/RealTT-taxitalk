@@ -560,11 +560,14 @@ class Settings:
     stt_beam_size: int = 5
     stt_beam_size_partial: int = 1
     # 확정 전사의 온도 후퇴 단계. 값이 하나면 후퇴가 없다.
-    # 여러 단계를 두면 모델이 자신 없는 발화에서 빔 탐색이 같은 말을 되풀이하며
-    # 무너질 때 whisper 가 다음 온도로 다시 디코딩한다. 사투리·비표준 발화를 건지는
-    # 데는 도움이 되지만 실패한 구간마다 추가 디코딩이 붙어 지연이 늘어난다.
-    # 표준어를 기준으로 지연을 재는 동안은 후퇴 없이 고정해 둔다.
-    stt_temperatures: tuple[float, ...] = (0.0,)
+    # whisper 는 디코딩 결과가 자기 검사(반복 비율, 평균 로그확률)를 통과하지 못하면
+    # 다음 온도로 다시 디코딩한다. 단계가 하나뿐이면 물러설 곳이 없어서, 빔 탐색이
+    # 같은 말을 되풀이하며 무너진 결과("다, 다, 다, …")를 그대로 내보낸다.
+    # 실패한 구간에서만 추가 디코딩이 붙으므로 정상 발화의 지연은 그대로다.
+    stt_temperatures: tuple[float, ...] = (0.0, 0.2, 0.4)
+    # 전사 평균 로그확률이 이보다 낮으면 발화를 버린다. 언어를 무엇으로 읽어도
+    # 그럴듯하지 않았다는 뜻이고, 그런 결과는 대개 지어낸 문장이다.
+    stt_min_logprob: float = -1.0
     # 발화 중 중간 자막 주기(초). 0 이면 중간 자막을 만들지 않는다.
     partial_interval_sec: float = 1.2
     min_utterance_sec: float = 0.4
@@ -667,7 +670,8 @@ class Settings:
             stt_workers=_i("STT_WORKERS", 2),
             stt_beam_size=_i("STT_BEAM_SIZE", 5),
             stt_beam_size_partial=_i("STT_BEAM_SIZE_PARTIAL", 1),
-            stt_temperatures=_floats("STT_TEMPERATURES", (0.0,)),
+            stt_temperatures=_floats("STT_TEMPERATURES", (0.0, 0.2, 0.4)),
+            stt_min_logprob=_f("STT_MIN_LOGPROB", -1.0),
             partial_interval_sec=_f("PARTIAL_INTERVAL_SEC", 1.2),
             min_utterance_sec=_f("MIN_UTTERANCE_SEC", 0.4),
             max_utterance_sec=_f("MAX_UTTERANCE_SEC", 60.0),

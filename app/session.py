@@ -512,6 +512,30 @@ class ConsultSession:
                 await self._send_safe({"type": "empty", "turn": turn.id})
                 return
 
+            # 어느 언어로 읽어도 그럴듯하지 않았던 발화는 버린다. 이 구간에서 whisper
+            # 는 빈 결과를 내는 대신 그럴듯한 문장을 지어내므로, 그대로 두면 아무도
+            # 하지 않은 말이 번역돼 기록에 남는다.
+            score = stt_result.get("avg_logprob")
+            if score is not None and score < self._s.stt_min_logprob:
+                log.info(
+                    "턴 %s 폐기: 전사 신뢰도 %.3f < %.3f (%r)",
+                    turn.id,
+                    score,
+                    self._s.stt_min_logprob,
+                    source_text[:40],
+                )
+                await self._send_safe(
+                    {"type": "empty", "turn": turn.id, "reason": "low_confidence"}
+                )
+                return
+
+            if self._glossary.echoes_prompt(source_text):
+                log.info("턴 %s 폐기: 용어집 프롬프트 되뇜 (%r)", turn.id, source_text[:40])
+                await self._send_safe(
+                    {"type": "empty", "turn": turn.id, "reason": "prompt_echo"}
+                )
+                return
+
             await self._send(
                 {
                     "type": "transcript",

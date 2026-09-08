@@ -48,6 +48,24 @@ _PROMPT_LEAD = {
     "id": "Percakapan pemanduan wisata Busan. Nama tempat dan istilah yang sering muncul:",
 }
 
+# 알아듣지 못한 오디오에서 whisper 는 빈 결과를 내는 대신 `initial_prompt` 를 이어
+# 쓴다. 그러면 위 머리말이 그대로 승객의 말인 양 올라온다. 머리말은 서비스가 지어
+# 넣은 문장이라 아무도 말할 리 없으므로, 되뇐 것이 보이면 발화째로 버린다.
+# 용어 목록 쪽은 검사 대상이 아니다. 그쪽은 승객이 실제로 말하는 지명이다.
+_ECHO_STRIP = re.compile(r"[\s.,:;!?·・、。！？…\-–—'\"“”()\[\]]+")
+
+
+def _echo_key(text: str) -> str:
+    return _ECHO_STRIP.sub("", text.lower())
+
+
+_LEAD_FRAGMENTS = tuple(
+    fragment
+    for lead in _PROMPT_LEAD.values()
+    for piece in re.split(r"[.。:：]", lead)
+    if len(fragment := _echo_key(piece)) >= 10
+)
+
 
 @dataclass(frozen=True)
 class Term:
@@ -191,6 +209,17 @@ class Glossary:
             prompt = f"{lead} " + ", ".join(words) + "."
         self._prompts[key] = prompt
         return prompt
+
+    def echoes_prompt(self, text: str) -> bool:
+        """전사가 프롬프트 머리말을 그대로 되뇌었는지.
+
+        머리말만 본다. 용어 목록까지 검사하면 "페어필드 바이 메리어트 부산 송도비치"
+        처럼 긴 지명을 그대로 말한 승객이 걸려 버린다.
+        """
+        body = _echo_key(text)
+        if not body:
+            return False
+        return any(fragment in body for fragment in _LEAD_FRAGMENTS)
 
     def match(self, text: str, src: str, dst: str) -> list[tuple[str, str]]:
         """원문에 나온 용어만 `(원문 표기, 대상 언어 표기)` 로 돌려준다.
