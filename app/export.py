@@ -48,8 +48,8 @@ def _duration(meta: dict) -> str:
 
 def _speaker_label(speaker: str, patient_lang: str) -> str:
     if speaker == "staff":
-        return "대화원"
-    return f"고객 ({lang_label(patient_lang)})"
+        return "택시기사"
+    return f"탑승객 ({lang_label(patient_lang)})"
 
 
 def _pair_label(patient_lang: str) -> str:
@@ -79,7 +79,7 @@ def to_text(meta: dict, turns: Iterable[dict]) -> str:
         f"발화 : {meta.get('turns', 0)}건",
     ]
     if meta.get("clinic"):
-        lines.insert(2, f"기관 : {meta['clinic']}")
+        lines.insert(2, f"운영 : {meta['clinic']}")
     lines.append("=" * 60)
     lines.append("")
 
@@ -169,7 +169,7 @@ def to_html(meta: dict, turns: Iterable[dict]) -> str:
         )
 
     body = "\n".join(rows) or '      <p class="empty">기록된 발화가 없습니다.</p>'
-    clinic = html.escape(str(meta.get("clinic") or "성형외과·피부과 외국인 고객 대화"))
+    clinic = html.escape(str(meta.get("clinic") or "부산 관광투어 택시 통역"))
 
     return f"""<!doctype html>
 <html lang="ko">

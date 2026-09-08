@@ -18,7 +18,7 @@ param(
     [switch]$SkipBuild,
     [switch]$SkipNginx,
     [switch]$SkipHealth,
-    [string]$RemoteDir = '/home/user/taxitalk',
+    [string]$RemoteDir = '/home/user/demo/taxitalk',
     # 접속 정보 파일. 비워 두면 프로젝트 옆의 ELTOV_GPU_SERVER\.env 를 쓴다.
     [string]$CredFile,
     # 서버 .env 의 값을 덮어쓴다. 기존 값이 있어도 바꾼다는 점이 `.env.example`
@@ -193,7 +193,7 @@ echo "nginx 반영 완료"
 $Health = @'
 SUDO() { echo '__PW__' | sudo -S -p "" "$@"; }
 for i in $(seq 1 72); do
-  code=$(curl -s -o /tmp/_taxitalk_health.json -w '%{http_code}' http://127.0.0.1:18092/health || echo 000)
+  code=$(curl -s -o /tmp/_taxitalk_health.json -w '%{http_code}' http://127.0.0.1:18093/health || echo 000)
   ok=$(python3 -c "import json;print(json.load(open('/tmp/_taxitalk_health.json')).get('ok'))" 2>/dev/null || echo -)
   echo "[$i] http=$code ok=$ok"
   if [ "$ok" = "True" ]; then break; fi
@@ -202,7 +202,7 @@ done
 echo "--- /health ---"
 cat /tmp/_taxitalk_health.json; echo
 echo "--- /api/config ---"
-curl -s http://127.0.0.1:18092/api/config | head -c 400; echo
+curl -s http://127.0.0.1:18093/api/config | head -c 400; echo
 echo "--- GPU ---"
 nvidia-smi --query-gpu=index,memory.used,memory.total --format=csv,noheader
 echo "--- 최근 로그 ---"

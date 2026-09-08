@@ -1,11 +1,12 @@
-"""성형외과·피부과 전문용어 사전.
+"""부산 관광투어 지명·용어 사전.
 
 범용 STT·번역 모델을 그대로 쓰면서 이 분야 용어만 정확히 처리하기 위한 장치다.
+지명은 특히 번역 모델에 맡기면 매번 다른 음차가 나오므로 표기를 못 박아야 한다.
 같은 사전을 세 군데에 쓴다.
 
 1. `initial_prompt()` — whisper 에 용어 목록을 미리 들려줘 인식을 그쪽으로 기울인다.
 2. `match()` — 원문에 실제로 나온 용어만 골라 번역 프롬프트에 대응표로 붙인다.
-3. `canonicalize()` — `울세라` 처럼 굳어진 오인식을 확정 표기로 되돌린다.
+3. `canonicalize()` — `해운대 해수욕장` 처럼 흘려 받아쓴 표기를 확정 표기로 되돌린다.
 
 용어를 늘릴 때는 `data/glossary/terms.json` 만 고치면 된다.
 """
@@ -32,19 +33,19 @@ _LATIN_LANGS = LATIN_SCRIPT_LANGS
 # whisper initial_prompt 앞에 붙일 문맥 한 줄. 목록만 나열하는 것보다 인식이 안정적이다.
 # 용어집이 채워진 언어만 있으면 된다. 나머지는 영어 문장으로 대체한다.
 _PROMPT_LEAD = {
-    "ko": "성형외과·피부과 대화입니다. 다음 용어가 자주 나옵니다:",
-    "en": "A plastic surgery and dermatology consultation. Common terms:",
-    "zh": "整形外科与皮肤科咨询。常见术语：",
-    "yue": "整形外科同皮膚科諮詢。常見術語：",
-    "ja": "美容外科・皮膚科のカウンセリングです。よく出る用語:",
-    "vi": "Tư vấn phẫu thuật thẩm mỹ và da liễu. Các thuật ngữ thường gặp:",
-    "ru": "Консультация по пластической хирургии и дерматологии. Частые термины:",
-    "th": "การให้คำปรึกษาด้านศัลยกรรมตกแต่งและผิวหนัง คำศัพท์ที่พบบ่อย:",
-    "mn": "Гоо сайхны мэс засал, арьсны эмчилгээний зөвлөгөө. Түгээмэл нэр томьёо:",
-    "uz": "Plastik jarrohlik va dermatologiya maslahati. Keng tarqalgan atamalar:",
-    "ar": "استشارة في جراحة التجميل والأمراض الجلدية. المصطلحات الشائعة:",
-    "es": "Consulta de cirugía plástica y dermatología. Términos frecuentes:",
-    "id": "Konsultasi bedah plastik dan dermatologi. Istilah yang sering muncul:",
+    "ko": "부산 관광 안내 대화입니다. 다음 지명과 용어가 자주 나옵니다:",
+    "en": "A Busan sightseeing tour conversation. Common place names and terms:",
+    "zh": "釜山观光导览对话。常见地名与用语：",
+    "yue": "釜山觀光導覽對話。常見地名同用語：",
+    "ja": "釜山観光の案内会話です。よく出る地名・用語:",
+    "vi": "Hội thoại hướng dẫn du lịch Busan. Địa danh và thuật ngữ thường gặp:",
+    "ru": "Разговор во время экскурсии по Пусану. Частые названия и термины:",
+    "th": "บทสนทนานำเที่ยวปูซาน ชื่อสถานที่และคำศัพท์ที่พบบ่อย:",
+    "mn": "Пусан хотын аяллын хөтөчийн яриа. Түгээмэл газрын нэр, нэр томьёо:",
+    "uz": "Pusan shahri boʻylab sayohat suhbati. Keng tarqalgan joy nomlari va atamalar:",
+    "ar": "محادثة إرشاد سياحي في بوسان. أسماء الأماكن والمصطلحات الشائعة:",
+    "es": "Conversación de una visita turística por Busan. Lugares y términos frecuentes:",
+    "id": "Percakapan pemanduan wisata Busan. Nama tempat dan istilah yang sering muncul:",
 }
 
 
@@ -54,9 +55,16 @@ class Term:
     priority: int
     forms: dict[str, str]
     alias: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    # 지명·호텔·상호처럼 정해진 로마자 표기를 쓰는 고유명사. 라틴 문자 언어는 어차피
+    # 같은 표기를 쓰므로 `en` 을 빌려온다. 지명마다 같은 값을 열 번 적지 않으려는 것이다.
+    # 키릴·타이·아랍 문자 언어는 확정 음차가 없어 비워 두고 번역 모델에 맡긴다.
+    romanized: bool = False
 
     def form(self, lang: str) -> Optional[str]:
-        return self.forms.get(lang)
+        direct = self.forms.get(lang)
+        if direct or not self.romanized or lang not in _LATIN_LANGS:
+            return direct
+        return self.forms.get("en")
 
 
 class Glossary:
@@ -95,6 +103,7 @@ class Glossary:
                     priority=int(entry.get("priority") or 0),
                     forms=forms,
                     alias={code: values for code, values in alias.items() if values},
+                    romanized=bool(entry.get("romanized")),
                 )
             )
         log.info("용어집 %s개 로드: %s", len(terms), target)
@@ -122,7 +131,7 @@ class Glossary:
 
         index: dict[str, Term] = {}
         for term in self._terms:
-            candidates = [term.forms.get(lang), *term.alias.get(lang, ())]
+            candidates = [term.form(lang), *term.alias.get(lang, ())]
             for candidate in candidates:
                 if candidate:
                     index.setdefault(self._fold(candidate, lang), term)
@@ -147,7 +156,7 @@ class Glossary:
 
         rules: list[tuple[re.Pattern, str]] = []
         for term in self._terms:
-            canonical = term.forms.get(lang)
+            canonical = term.form(lang)
             aliases = [a for a in term.alias.get(lang, ()) if a and a != canonical]
             if not canonical or not aliases:
                 continue
@@ -175,7 +184,7 @@ class Glossary:
             return cached
 
         ranked = sorted(self._terms, key=lambda t: (-t.priority, t.id))
-        words = [term.forms[lang] for term in ranked if term.forms.get(lang)][:limit]
+        words = [form for term in ranked if (form := term.form(lang))][:limit]
         prompt = ""
         if words:
             lead = _PROMPT_LEAD.get(lang, _PROMPT_LEAD["en"])
@@ -201,11 +210,11 @@ class Glossary:
             term = index.get(self._fold(hit.group(0), src))
             if term is None or term.id in seen:
                 continue
-            target = term.forms.get(dst)
+            target = term.form(dst)
             if not target:
                 continue
             seen.add(term.id)
-            found.append((term.forms.get(src) or hit.group(0), target))
+            found.append((term.form(src) or hit.group(0), target))
         return found
 
     def canonicalize(self, text: str, lang: str) -> str:

@@ -6,7 +6,7 @@
 
 여기에 더해 마이크 1개 모드를 위한 언어 판별이 있다. whisper 의 전체 자동 감지는
 후보가 99개라 짧은 발화에서 엉뚱한 언어로 새기 쉬우므로, 확률 분포를 받아
-**한국어와 고객 언어 둘 중에서만** 고른다.
+**한국어와 탑승객 언어 둘 중에서만** 고른다.
 """
 
 from __future__ import annotations
@@ -176,24 +176,41 @@ class SttEngine:
         language: Optional[str],
         beam_size: int,
         initial_prompt: Optional[str],
+        temperatures: Sequence[float],
     ) -> dict:
         segments, info = self._model.transcribe(
             audio,
             language=language,
             beam_size=beam_size,
-            temperature=0.0,
+            temperature=list(temperatures) or [0.0],
             condition_on_previous_text=False,
             initial_prompt=initial_prompt or None,
             vad_filter=True,
             vad_parameters={"min_silence_duration_ms": 300},
             without_timestamps=True,
         )
-        text = "".join(seg.text for seg in segments).strip()
+        segs = list(segments)
+        text = "".join(seg.text for seg in segs).strip()
+        # 세그먼트별 평균 로그확률을 토큰 수로 가중해 하나로 합친다. 긴 세그먼트가
+        # 짧은 감탄사와 같은 무게를 갖지 않게 한다.
+        weights = [max(1, len(seg.tokens or ())) for seg in segs]
+        total = sum(weights)
+        avg_logprob = (
+            sum(seg.avg_logprob * weight for seg, weight in zip(segs, weights)) / total
+            if segs and total
+            else None
+        )
         return {
             "text": text,
             "language": info.language,
             "language_probability": round(float(info.language_probability or 0.0), 3),
             "duration": round(float(info.duration or 0.0), 2),
+            # 언어를 틀리게 강제해도 whisper 는 실패하지 않고 그럴듯한 문장을 짜낸다.
+            # 어느 언어로 읽은 것이 더 그럴듯했는지 비교하려면 이 점수가 필요하다.
+            "avg_logprob": round(avg_logprob, 3) if avg_logprob is not None else None,
+            "no_speech_prob": (
+                round(max(seg.no_speech_prob for seg in segs), 3) if segs else None
+            ),
         }
 
     async def transcribe(
@@ -206,8 +223,9 @@ class SttEngine:
     ) -> dict:
         """PCM16 버퍼를 전사한다. `language=None` 이면 whisper 자동 감지.
 
-        중간 자막(`final=False`)은 beam=1 로 값을 싸게 뽑고, 확정 결과는 beam=5 를 쓴다.
-        `initial_prompt` 로 전문용어를 넣으면 해당 어휘 쪽으로 인식이 기운다.
+        중간 자막(`final=False`)은 beam=1 · 온도 후퇴 없이 값을 싸게 뽑고, 확정
+        결과는 beam=5 에 온도 후퇴를 걸어 사투리처럼 어려운 발화를 건진다.
+        `initial_prompt` 로 전문용어·사투리 표기를 넣으면 그 어휘 쪽으로 인식이 기운다.
         """
         if self._model is None:
             raise RuntimeError("stt_not_ready")
@@ -217,11 +235,88 @@ class SttEngine:
         if seconds < self._s.min_utterance_sec:
             return {"text": "", "language": language or "", "duration": round(seconds, 2), "ms": 0}
 
-        beam = self._s.stt_beam_size if final else self._s.stt_beam_size_partial
+        if final:
+            beam = self._s.stt_beam_size
+            temperatures = self._s.stt_temperatures
+        else:
+            # 중간 자막은 곧 확정 결과로 덮인다. 후퇴에 시간을 쓸 이유가 없다.
+            beam = self._s.stt_beam_size_partial
+            temperatures = (0.0,)
+
         started = time.perf_counter()
         loop = asyncio.get_running_loop()
         result = await loop.run_in_executor(
-            self._pool, self._transcribe_sync, audio, language, beam, initial_prompt
+            self._pool, self._transcribe_sync, audio, language, beam, initial_prompt, temperatures
         )
         result["ms"] = int((time.perf_counter() - started) * 1000)
         return result
+
+    async def transcribe_best(
+        self,
+        pcm: bytes,
+        candidates: Sequence[str],
+        *,
+        prompts: Optional[dict[str, str]] = None,
+    ) -> dict:
+        """후보 언어로 각각 전사해 보고 모델이 더 자신 있어 한 쪽을 고른다.
+
+        마이크 1개 모드에서 화자를 정하는 용도다. `detect_language` 만 믿으면 안 되는
+        이유가 있다. 확률 분포가 한국어로 기울어 있어 또렷한 영어 문장도 한국어로
+        판별되는 일이 있고, 그렇게 언어를 틀리게 강제하면 whisper 는 실패하는 대신
+        그럴듯한 상용구("Thank you.", "Yes.")를 지어낸다. 그 결과물의 확신도는 제대로
+        전사된 문장보다 오히려 높게 나오기도 해서, 임계값으로는 걸러낼 수 없다.
+
+        그래서 두 번 전사하는 값을 치르고 실제 전사 점수로 고른다. 전사 자체를
+        비교하므로 판별기의 편향에 끌려가지 않는다.
+        """
+        if self._model is None:
+            raise RuntimeError("stt_not_ready")
+        langs = [code for code in dict.fromkeys(candidates) if code]
+        if not langs:
+            raise ValueError("no_candidates")
+        if len(langs) == 1:
+            result = await self.transcribe(
+                pcm, langs[0], final=True, initial_prompt=(prompts or {}).get(langs[0])
+            )
+            result["scores"] = {langs[0]: result.get("avg_logprob")}
+            return result
+
+        started = time.perf_counter()
+        results = await asyncio.gather(
+            *(
+                self.transcribe(
+                    pcm, code, final=True, initial_prompt=(prompts or {}).get(code)
+                )
+                for code in langs
+            )
+        )
+        by_lang = dict(zip(langs, results))
+        scores = {code: item.get("avg_logprob") for code, item in by_lang.items()}
+
+        # 빈 전사는 후보에서 뺀다. 아무것도 남지 않으면 무음으로 본다.
+        scored = [
+            (code, item)
+            for code, item in by_lang.items()
+            if item.get("text") and item.get("avg_logprob") is not None
+        ]
+        if not scored:
+            best_lang = langs[0]
+            best = dict(by_lang[best_lang])
+        else:
+            best_lang, best = max(scored, key=lambda kv: kv[1]["avg_logprob"])
+            best = dict(best)
+
+        runner = sorted(
+            (value for code, value in scores.items() if code != best_lang and value is not None),
+            reverse=True,
+        )
+        best["language"] = best_lang
+        best["scores"] = scores
+        # 1위와 2위의 점수 차. 작을수록 두 언어 어느 쪽으로 읽어도 그럴듯했다는 뜻이다.
+        best["score_margin"] = (
+            round(scores[best_lang] - runner[0], 3)
+            if scored and runner and scores.get(best_lang) is not None
+            else None
+        )
+        best["ms"] = int((time.perf_counter() - started) * 1000)
+        return best

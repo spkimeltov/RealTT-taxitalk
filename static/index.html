@@ -12,21 +12,24 @@
 <!--
   같은 대화를 두 벌 그려 두고 배치만 바꾼다.
 
-  single  1920 한 화면에 대화원과 고객이 함께 본다. 아래 `staff` 화면만 쓰고,
+  single  1920 한 화면에 기사와 탑승객이 함께 본다. 아래 `staff` 화면만 쓰고,
           발화마다 상대가 읽을 언어를 크게 띄운다.
   dual    3840x1080 창을 좌우로 반씩 나눠 모니터 두 대에 걸친다. 왼쪽은
-          대화원(한국어), 오른쪽은 고객(선택 언어)이 각자 자기 언어를 크게 본다.
+          기사(한국어), 오른쪽은 탑승객(선택 언어)이 각자 자기 언어를 크게 본다.
 -->
 <div class="stage">
 
-  <!-- ================================= 대화원 화면 (합친 화면에서는 이것만) -->
+  <!-- ================================= 기사 화면 (합친 화면에서는 이것만) -->
   <section class="screen" data-screen="staff">
     <header class="bar">
       <div class="brand">
         <span class="mark" aria-hidden="true">
+          <!-- 택시 측면. 창문과 바퀴집은 evenodd 로 파내서 배경 그러데이션이 비친다. -->
           <svg viewBox="0 0 24 24">
-            <path d="M12 3.4c-4.7 0-8.5 3.1-8.5 7 0 2.2 1.2 4.2 3.2 5.5v3.3l3.2-1.6c.7.1 1.4.2 2.1.2 4.7 0 8.5-3.1 8.5-7s-3.8-7.4-8.5-7.4Z" fill="currentColor"/>
-            <path d="M10.9 6.6h2.2v2.9H16v2.2h-2.9v2.9h-2.2v-2.9H8V9.5h2.9z" fill="#fff"/>
+            <rect x="9.1" y="2.2" width="5.8" height="2.9" rx="1.15" fill="currentColor"/>
+            <path fill="currentColor" fill-rule="evenodd" d="M7.6 5.8h8.8l3 4.1h1.4a2.1 2.1 0 0 1 2.1 2.1v3.2a1.4 1.4 0 0 1-1.4 1.4H2.5a1.4 1.4 0 0 1-1.4-1.4v-3.2a2.1 2.1 0 0 1 2.1-2.1h1.4zM9 7.5 7 9.9h4.1V7.5zm3.9 0v2.4H17L15 7.5zM3.9 16.6a3.3 3.3 0 0 1 6.6 0zm9.6 0a3.3 3.3 0 0 1 6.6 0z"/>
+            <circle cx="7.2" cy="17" r="2.4" fill="currentColor"/>
+            <circle cx="16.8" cy="17" r="2.4" fill="currentColor"/>
           </svg>
         </span>
         <span class="brand-text">
@@ -69,7 +72,13 @@
               </g>
               <circle cx="76" cy="24" r="9" class="bubble-2"/>
               <circle cx="59" cy="19" r="15" class="bubble-1"/>
-              <path d="M57.4 11.6h3.2v4.2h4.2v3.2h-4.2v4.2h-3.2v-4.2h-4.2v-3.2h4.2z" fill="#fff"/>
+              <!-- 위 헤더와 같은 택시 도형을 말풍선 안에 맞춰 축소해 넣는다. -->
+              <g transform="translate(49.6 9.8) scale(.85)" fill="#fff">
+                <rect x="9.1" y="2.2" width="5.8" height="2.9" rx="1.15"/>
+                <path fill-rule="evenodd" d="M7.6 5.8h8.8l3 4.1h1.4a2.1 2.1 0 0 1 2.1 2.1v3.2a1.4 1.4 0 0 1-1.4 1.4H2.5a1.4 1.4 0 0 1-1.4-1.4v-3.2a2.1 2.1 0 0 1 2.1-2.1h1.4zM9 7.5 7 9.9h4.1V7.5zm3.9 0v2.4H17L15 7.5zM3.9 16.6a3.3 3.3 0 0 1 6.6 0zm9.6 0a3.3 3.3 0 0 1 6.6 0z"/>
+                <circle cx="7.2" cy="17" r="2.4"/>
+                <circle cx="16.8" cy="17" r="2.4"/>
+              </g>
             </svg>
           </span>
           <p class="hero-eyebrow">관광투어 AI 통역시스템</p>
@@ -86,7 +95,7 @@
 
       <!-- 종료 화면 -->
       <div class="panel ended" data-panel="ended">
-        <h1>대화이 종료되었습니다</h1>
+        <h1>대화가 종료되었습니다</h1>
         <p class="lead merged-only" data-ended-title></p>
         <p class="lead merged-only" data-ended-note></p>
         <!-- <dl class="summary" data-summary></dl>
@@ -99,14 +108,15 @@
       </div>
     </main>
 
-    <!-- 언어를 고르는 동안만 띄우는 안내. 대화이 시작되면 접힌다. -->
+    <!-- 언어를 고르는 동안만 띄우는 안내. 대화가 시작되면 접힌다. -->
     <div class="notice">
       <span class="item">
         <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 2.6 4.6 5.4v6.1c0 4.6 3.1 8.4 7.4 9.9 4.3-1.5 7.4-5.3 7.4-9.9V5.4z" fill="currentColor"/>
-          <path d="M10.9 7.4h2.2v2.7H16v2.2h-2.9v2.7h-2.2v-2.7H8v-2.2h2.9z" fill="#fff"/>
+          <path d="m8.4 11.8 2.6 2.6 4.7-4.8" fill="none" stroke="#fff" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        모든 통역은 의료 환경에 최적화된 AI 기술로 안전하고 정확하게 제공합니다.
+        모든 통역은 관광 투어에 최적화된 AI 기술로 안전하고 정확하게 제공합니다.
       </span>
       <span class="sep"></span>
       <span class="item">
@@ -141,7 +151,7 @@
     </div>
   </section>
 
-  <!-- ============================= 고객 화면 (모니터 2 · dual 배치에서만 표시) -->
+  <!-- ============================= 탑승객 화면 (모니터 2 · dual 배치에서만 표시) -->
   <section class="screen" data-screen="patient">
     <header class="bar">
       <div class="pair" data-pair>AI TAXI-TALK</div>

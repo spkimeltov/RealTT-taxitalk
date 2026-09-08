@@ -20,7 +20,7 @@
     E2E_BASE=http://127.0.0.1:8000    HTTP 진입점 (nginx 경유 검증 시 교체)
     E2E_WS=ws://127.0.0.1:8000        WebSocket 진입점
     E2E_MODE=single|dual|both
-    E2E_PATIENT_LANG=en    고객 언어. 아래 SPEECH 에 예문이 있는 언어만 검사한다.
+    E2E_PATIENT_LANG=en    탑승객 언어. 아래 SPEECH 에 예문이 있는 언어만 검사한다.
 """
 
 from __future__ import annotations
@@ -52,14 +52,14 @@ SIDE_CODE = {"shared": 0, "staff": 1, "patient": 2}
 # 전문용어가 들어간 실제 대화 문장. 괄호 안은 결과에서 찾아볼 표기다.
 SPEECH = {
     "ko": (
-        "안녕하세요. 울쎄라와 써마지 중에서 고민 중이시군요. "
-        "필러는 회복기간이 짧아서 다음 날 바로 출근하실 수 있습니다.",
-        ["울쎄라", "써마지", "필러", "회복기간"],
+        "안녕하세요. 해운대해수욕장 먼저 보시고 광안대교 야경까지 도시겠습니다. "
+        "감천문화마을을 경유지로 넣으면 소요시간은 한 시간 정도 늘어납니다.",
+        ["해운대해수욕장", "광안대교", "감천문화마을", "소요시간"],
     ),
     "en": (
-        "How much downtime is there after Botox and filler? "
-        "I am also worried about swelling and bruising around my eyes.",
-        ["downtime", "Botox", "filler", "swelling"],
+        "Can we go to Jagalchi Market first and then Gamcheon Culture Village? "
+        "I also want to know the base fare and whether card payment is possible.",
+        ["Jagalchi Market", "Gamcheon Culture Village", "base fare", "card payment"],
     ),
 }
 

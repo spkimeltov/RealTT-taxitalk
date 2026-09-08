@@ -17,7 +17,7 @@ SAMPLE_RATE = 16000
 SAMPLE_WIDTH = 2
 BYTES_PER_SEC = SAMPLE_RATE * SAMPLE_WIDTH
 
-# 대화원은 항상 한국어다. 대화 시작 시 고르는 것은 고객 언어 하나뿐이다.
+# 기사는 항상 한국어다. 대화 시작 시 고르는 것은 탑승객 언어 하나뿐이다.
 STAFF_LANG = "ko"
 
 SIDE_STAFF = "staff"
@@ -31,7 +31,10 @@ SIDE_SHARED = "shared"
 SIDE_BY_CODE = {0: SIDE_SHARED, 1: SIDE_STAFF, 2: SIDE_PATIENT}
 CODE_BY_SIDE = {side: code for code, side in SIDE_BY_CODE.items()}
 
-MIC_MODES = ("single", "dual")
+# 마이크 1개는 공용 채널로 올라와 화자를 언어로 가른다. 2개는 채널이 곧 화자다.
+MIC_SINGLE = "single"
+MIC_DUAL = "dual"
+MIC_MODES = (MIC_SINGLE, MIC_DUAL)
 SCREEN_LAYOUTS = ("single", "dual")
 
 # --------------------------------------------------------------- 언어 카탈로그
@@ -42,7 +45,7 @@ SCREEN_LAYOUTS = ("single", "dual")
 #
 #     코드: (영문명, 원어 표기, 한국어 표기, 등급)
 #
-# 영문명은 번역 프롬프트에, 원어 표기는 고객이 읽을 자리에, 한국어 표기는 대화원이
+# 영문명은 번역 프롬프트에, 원어 표기는 탑승객이 읽을 자리에, 한국어 표기는 기사가
 # 읽을 자리에 쓴다. 등급은 언어별 학습량 차이를 화면에 그대로 드러내려고 붙였다. 목록에 있다고
 # 다 같은 품질이 나오지는 않는다.
 #
@@ -57,7 +60,7 @@ TIER_SUPPORTED = 2
 TIER_EXPERIMENTAL = 3
 
 LANGUAGES: dict[str, tuple[str, str, str, int]] = {
-    # --- 대화원 ---
+    # --- 기사 ---
     "ko": ("Korean", "한국어", "한국어", TIER_RECOMMENDED),
     # --- 권장 ---
     "en": ("English", "English", "영어", TIER_RECOMMENDED),
@@ -99,7 +102,7 @@ LANGUAGES: dict[str, tuple[str, str, str, int]] = {
     "ne": ("Nepali", "नेपाली", "네팔어", TIER_EXPERIMENTAL),
 }
 
-# 오른쪽에서 왼쪽으로 쓰는 언어. 고객 화면의 글 방향을 뒤집는다.
+# 오른쪽에서 왼쪽으로 쓰는 언어. 탑승객 화면의 글 방향을 뒤집는다.
 RTL_LANGS = frozenset({"ar", "fa"})
 
 # 아래 세 표는 카탈로그에서 뽑아 쓴다. 언어를 늘릴 때는 `LANGUAGES` 만 고치면 된다.
@@ -117,7 +120,7 @@ LATIN_SCRIPT_LANGS = frozenset(
 )
 
 # 시작 화면에 카드로 띄울 기본 언어 15개. `PATIENT_LANGUAGES` 로 덮어쓴다.
-# 여기 적은 순서가 곧 카드가 놓이는 순서다. 고객이 늘 같은 자리에서 자기 언어를
+# 여기 적은 순서가 곧 카드가 놓이는 순서다. 탑승객이 늘 같은 자리에서 자기 언어를
 # 찾도록 대화 이력에 따라 자리를 바꾸지 않으므로, 자주 오는 언어를 앞에 둔다.
 # 한 줄에 일곱 장씩 놓이므로 7 · 7 · 1 로 떨어진다.
 DEFAULT_PATIENT_LANGUAGES = (
@@ -125,331 +128,331 @@ DEFAULT_PATIENT_LANGUAGES = (
     "vi", "ru", "id", "ms", "ar", "fr", "de", "es",
 )
 
-# 고객 화면은 고객 언어로만 채운다. 등록되지 않은 언어는 영어로 보여준다.
+# 탑승객 화면은 탑승객 언어로만 채운다. 등록되지 않은 언어는 영어로 보여준다.
 UI_TEXT = {
     "ko": {
-        "staff": "대화원",
-        "patient": "고객",
+        "staff": "택시기사",
+        "patient": "탑승객",
         "listening": "듣는 중",
         "paused": "일시정지",
         "connecting": "연결 중",
         "offline": "연결 끊김",
-        "waiting": "대화을 준비하고 있습니다",
+        "waiting": "통역을 준비하고 있습니다",
         "select_hint": "사용하실 언어를 선택해 주세요",
-        "ended": "대화이 종료되었습니다",
+        "ended": "대화가 종료되었습니다",
         "thanks": "이용해 주셔서 감사합니다",
     },
     "en": {
-        "staff": "Staff",
-        "patient": "Patient",
+        "staff": "Driver",
+        "patient": "Passenger",
         "listening": "Listening",
         "paused": "Paused",
         "connecting": "Connecting",
         "offline": "Disconnected",
-        "waiting": "Preparing your consultation",
+        "waiting": "Preparing your interpretation",
         "select_hint": "Please select your language",
-        "ended": "The consultation has ended",
-        "thanks": "Thank you for visiting",
+        "ended": "The conversation has ended",
+        "thanks": "Thank you for riding with us",
     },
     "zh": {
-        "staff": "咨询顾问",
-        "patient": "顾客",
+        "staff": "司机",
+        "patient": "乘客",
         "listening": "正在聆听",
         "paused": "已暂停",
         "connecting": "连接中",
         "offline": "连接已断开",
-        "waiting": "正在准备咨询",
+        "waiting": "正在准备翻译",
         "select_hint": "请选择您使用的语言",
-        "ended": "咨询已结束",
-        "thanks": "感谢您的到访",
+        "ended": "对话已结束",
+        "thanks": "感谢您的乘坐",
     },
     "ja": {
-        "staff": "カウンセラー",
-        "patient": "患者さま",
+        "staff": "運転手",
+        "patient": "お客さま",
         "listening": "認識中",
         "paused": "一時停止",
         "connecting": "接続中",
         "offline": "接続が切れました",
-        "waiting": "カウンセリングの準備をしています",
+        "waiting": "通訳の準備をしています",
         "select_hint": "ご利用の言語をお選びください",
-        "ended": "カウンセリングが終了しました",
-        "thanks": "ご来院ありがとうございました",
+        "ended": "会話が終了しました",
+        "thanks": "ご乗車ありがとうございました",
     },
     "vi": {
-        "staff": "Nhân viên tư vấn",
-        "patient": "Khách hàng",
+        "staff": "Tài xế",
+        "patient": "Hành khách",
         "listening": "Đang nghe",
         "paused": "Tạm dừng",
         "connecting": "Đang kết nối",
         "offline": "Mất kết nối",
-        "waiting": "Đang chuẩn bị buổi tư vấn",
+        "waiting": "Đang chuẩn bị phiên dịch",
         "select_hint": "Vui lòng chọn ngôn ngữ của bạn",
-        "ended": "Buổi tư vấn đã kết thúc",
-        "thanks": "Cảm ơn quý khách",
+        "ended": "Cuộc trò chuyện đã kết thúc",
+        "thanks": "Cảm ơn quý khách đã đi xe",
     },
     "ru": {
-        "staff": "Консультант",
-        "patient": "Пациент",
+        "staff": "Водитель",
+        "patient": "Пассажир",
         "listening": "Слушаю",
         "paused": "Пауза",
         "connecting": "Подключение",
         "offline": "Соединение потеряно",
-        "waiting": "Готовим консультацию",
+        "waiting": "Готовим перевод",
         "select_hint": "Выберите ваш язык",
-        "ended": "Консультация завершена",
-        "thanks": "Спасибо за визит",
+        "ended": "Разговор завершён",
+        "thanks": "Спасибо за поездку",
     },
     "yue": {
-        "staff": "顧問",
-        "patient": "顧客",
+        "staff": "司機",
+        "patient": "乘客",
         "listening": "聆聽中",
         "paused": "已暫停",
         "connecting": "連接中",
         "offline": "連接已中斷",
-        "waiting": "正在準備諮詢",
+        "waiting": "正在準備翻譯",
         "select_hint": "請揀你使用嘅語言",
-        "ended": "諮詢已結束",
-        "thanks": "多謝你嘅光臨",
+        "ended": "對話已結束",
+        "thanks": "多謝你嘅乘坐",
     },
     "th": {
-        "staff": "เจ้าหน้าที่ให้คำปรึกษา",
-        "patient": "ผู้รับบริการ",
+        "staff": "คนขับรถ",
+        "patient": "ผู้โดยสาร",
         "listening": "กำลังฟัง",
         "paused": "หยุดชั่วคราว",
         "connecting": "กำลังเชื่อมต่อ",
         "offline": "การเชื่อมต่อขาดหาย",
-        "waiting": "กำลังเตรียมการให้คำปรึกษา",
+        "waiting": "กำลังเตรียมการแปล",
         "select_hint": "กรุณาเลือกภาษาที่ท่านใช้",
-        "ended": "การให้คำปรึกษาสิ้นสุดแล้ว",
+        "ended": "การสนทนาสิ้นสุดแล้ว",
         "thanks": "ขอบคุณที่ใช้บริการ",
     },
     "mn": {
-        "staff": "Зөвлөх ажилтан",
-        "patient": "Үйлчлүүлэгч",
+        "staff": "Жолооч",
+        "patient": "Зорчигч",
         "listening": "Сонсож байна",
         "paused": "Түр зогсоов",
         "connecting": "Холбогдож байна",
         "offline": "Холболт тасарлаа",
-        "waiting": "Зөвлөгөөнд бэлтгэж байна",
+        "waiting": "Орчуулгад бэлтгэж байна",
         "select_hint": "Хэрэглэх хэлээ сонгоно уу",
-        "ended": "Зөвлөгөө дууслаа",
-        "thanks": "Ирсэнд баярлалаа",
+        "ended": "Харилцан яриа дууслаа",
+        "thanks": "Аялсанд баярлалаа",
     },
     "uz": {
-        "staff": "Maslahatchi",
-        "patient": "Bemor",
+        "staff": "Haydovchi",
+        "patient": "Yoʻlovchi",
         "listening": "Tinglanmoqda",
         "paused": "Toʻxtatildi",
         "connecting": "Ulanmoqda",
         "offline": "Aloqa uzildi",
-        "waiting": "Maslahat tayyorlanmoqda",
+        "waiting": "Tarjima tayyorlanmoqda",
         "select_hint": "Iltimos, tilingizni tanlang",
-        "ended": "Maslahat yakunlandi",
-        "thanks": "Tashrifingiz uchun rahmat",
+        "ended": "Suhbat yakunlandi",
+        "thanks": "Safaringiz uchun rahmat",
     },
     "ar": {
-        "staff": "مستشار",
-        "patient": "المريض",
+        "staff": "السائق",
+        "patient": "الراكب",
         "listening": "جارٍ الاستماع",
         "paused": "متوقف مؤقتًا",
         "connecting": "جارٍ الاتصال",
         "offline": "انقطع الاتصال",
-        "waiting": "نقوم بتجهيز الاستشارة",
+        "waiting": "نقوم بتجهيز الترجمة",
         "select_hint": "يرجى اختيار لغتك",
-        "ended": "انتهت الاستشارة",
-        "thanks": "شكرًا لزيارتكم",
+        "ended": "انتهت المحادثة",
+        "thanks": "شكرًا لرحلتكم معنا",
     },
     "es": {
-        "staff": "Asesor",
-        "patient": "Paciente",
+        "staff": "Conductor",
+        "patient": "Pasajero",
         "listening": "Escuchando",
         "paused": "En pausa",
         "connecting": "Conectando",
         "offline": "Conexión perdida",
-        "waiting": "Preparando su consulta",
+        "waiting": "Preparando la traducción",
         "select_hint": "Seleccione su idioma",
-        "ended": "La consulta ha finalizado",
-        "thanks": "Gracias por su visita",
+        "ended": "La conversación ha finalizado",
+        "thanks": "Gracias por viajar con nosotros",
     },
     "id": {
-        "staff": "Konsultan",
-        "patient": "Pasien",
+        "staff": "Pengemudi",
+        "patient": "Penumpang",
         "listening": "Mendengarkan",
         "paused": "Dijeda",
         "connecting": "Menghubungkan",
         "offline": "Koneksi terputus",
-        "waiting": "Menyiapkan konsultasi Anda",
+        "waiting": "Menyiapkan penerjemahan",
         "select_hint": "Silakan pilih bahasa Anda",
-        "ended": "Konsultasi telah selesai",
-        "thanks": "Terima kasih atas kunjungan Anda",
+        "ended": "Percakapan telah selesai",
+        "thanks": "Terima kasih telah menggunakan layanan kami",
     },
     "ms": {
-        "staff": "Perunding",
-        "patient": "Pesakit",
+        "staff": "Pemandu",
+        "patient": "Penumpang",
         "listening": "Sedang mendengar",
         "paused": "Dijeda",
         "connecting": "Menyambung",
         "offline": "Sambungan terputus",
-        "waiting": "Sedang menyediakan sesi perundingan anda",
+        "waiting": "Sedang menyediakan terjemahan",
         "select_hint": "Sila pilih bahasa anda",
-        "ended": "Sesi perundingan telah tamat",
-        "thanks": "Terima kasih atas kunjungan anda",
+        "ended": "Perbualan telah tamat",
+        "thanks": "Terima kasih kerana menggunakan perkhidmatan kami",
     },
     "tl": {
-        "staff": "Tagapayo",
-        "patient": "Pasyente",
+        "staff": "Drayber",
+        "patient": "Pasahero",
         "listening": "Nakikinig",
         "paused": "Naka-pause",
         "connecting": "Kumokonekta",
         "offline": "Nawalan ng koneksyon",
-        "waiting": "Inihahanda ang inyong konsultasyon",
+        "waiting": "Inihahanda ang pagsasalin",
         "select_hint": "Pakipili ang inyong wika",
-        "ended": "Tapos na ang konsultasyon",
-        "thanks": "Salamat sa inyong pagbisita",
+        "ended": "Tapos na ang pag-uusap",
+        "thanks": "Salamat sa pagsakay",
     },
     "fr": {
-        "staff": "Conseiller",
-        "patient": "Patient",
+        "staff": "Chauffeur",
+        "patient": "Passager",
         "listening": "Écoute en cours",
         "paused": "En pause",
         "connecting": "Connexion en cours",
         "offline": "Connexion perdue",
-        "waiting": "Préparation de votre consultation",
+        "waiting": "Préparation de la traduction",
         "select_hint": "Veuillez choisir votre langue",
-        "ended": "La consultation est terminée",
-        "thanks": "Merci de votre visite",
+        "ended": "La conversation est terminée",
+        "thanks": "Merci d’avoir voyagé avec nous",
     },
     "de": {
-        "staff": "Berater",
-        "patient": "Patient",
+        "staff": "Fahrer",
+        "patient": "Fahrgast",
         "listening": "Hört zu",
         "paused": "Pausiert",
         "connecting": "Verbindung wird hergestellt",
         "offline": "Verbindung getrennt",
-        "waiting": "Ihre Beratung wird vorbereitet",
+        "waiting": "Die Übersetzung wird vorbereitet",
         "select_hint": "Bitte wählen Sie Ihre Sprache",
-        "ended": "Die Beratung ist beendet",
-        "thanks": "Danke für Ihren Besuch",
+        "ended": "Das Gespräch ist beendet",
+        "thanks": "Danke für Ihre Fahrt",
     },
     "pt": {
-        "staff": "Consultor",
-        "patient": "Paciente",
+        "staff": "Motorista",
+        "patient": "Passageiro",
         "listening": "Ouvindo",
         "paused": "Pausado",
         "connecting": "Conectando",
         "offline": "Conexão perdida",
-        "waiting": "Preparando sua consulta",
+        "waiting": "Preparando a tradução",
         "select_hint": "Selecione seu idioma",
-        "ended": "A consulta foi encerrada",
-        "thanks": "Obrigado pela sua visita",
+        "ended": "A conversa foi encerrada",
+        "thanks": "Obrigado pela viagem",
     },
     "it": {
-        "staff": "Consulente",
-        "patient": "Paziente",
+        "staff": "Autista",
+        "patient": "Passeggero",
         "listening": "In ascolto",
         "paused": "In pausa",
         "connecting": "Connessione in corso",
         "offline": "Connessione persa",
-        "waiting": "Stiamo preparando la sua consulenza",
+        "waiting": "Stiamo preparando la traduzione",
         "select_hint": "Selezioni la sua lingua",
-        "ended": "La consulenza è terminata",
-        "thanks": "Grazie della visita",
+        "ended": "La conversazione è terminata",
+        "thanks": "Grazie per il viaggio",
     },
     "pl": {
-        "staff": "Konsultant",
-        "patient": "Pacjent",
+        "staff": "Kierowca",
+        "patient": "Pasażer",
         "listening": "Słucham",
         "paused": "Wstrzymano",
         "connecting": "Łączenie",
         "offline": "Utracono połączenie",
-        "waiting": "Przygotowujemy konsultację",
+        "waiting": "Przygotowujemy tłumaczenie",
         "select_hint": "Proszę wybrać swój język",
-        "ended": "Konsultacja zakończona",
-        "thanks": "Dziękujemy za wizytę",
+        "ended": "Rozmowa zakończona",
+        "thanks": "Dziękujemy za podróż",
     },
     "uk": {
-        "staff": "Консультант",
-        "patient": "Пацієнт",
+        "staff": "Водій",
+        "patient": "Пасажир",
         "listening": "Слухаю",
         "paused": "Пауза",
         "connecting": "Підключення",
         "offline": "З’єднання втрачено",
-        "waiting": "Готуємо консультацію",
+        "waiting": "Готуємо переклад",
         "select_hint": "Оберіть вашу мову",
-        "ended": "Консультацію завершено",
-        "thanks": "Дякуємо за візит",
+        "ended": "Розмову завершено",
+        "thanks": "Дякуємо за поїздку",
     },
     "kk": {
-        "staff": "Кеңесші",
-        "patient": "Пациент",
+        "staff": "Жүргізуші",
+        "patient": "Жолаушы",
         "listening": "Тыңдалуда",
         "paused": "Кідіртілді",
         "connecting": "Қосылуда",
         "offline": "Байланыс үзілді",
-        "waiting": "Кеңес беруге дайындалудамыз",
+        "waiting": "Аудармаға дайындалудамыз",
         "select_hint": "Тіліңізді таңдаңыз",
-        "ended": "Кеңес аяқталды",
-        "thanks": "Келгеніңізге рақмет",
+        "ended": "Сөйлесу аяқталды",
+        "thanks": "Сапарыңыз үшін рақмет",
     },
     "tr": {
-        "staff": "Danışman",
-        "patient": "Hasta",
+        "staff": "Şoför",
+        "patient": "Yolcu",
         "listening": "Dinleniyor",
         "paused": "Duraklatıldı",
         "connecting": "Bağlanıyor",
         "offline": "Bağlantı kesildi",
-        "waiting": "Görüşmeniz hazırlanıyor",
+        "waiting": "Çeviri hazırlanıyor",
         "select_hint": "Lütfen dilinizi seçin",
         "ended": "Görüşme sona erdi",
-        "thanks": "Ziyaretiniz için teşekkürler",
+        "thanks": "Yolculuğunuz için teşekkürler",
     },
     "hi": {
-        "staff": "परामर्शदाता",
-        "patient": "रोगी",
+        "staff": "चालक",
+        "patient": "यात्री",
         "listening": "सुन रहे हैं",
         "paused": "रोका गया",
         "connecting": "कनेक्ट हो रहा है",
         "offline": "कनेक्शन टूट गया",
-        "waiting": "आपका परामर्श तैयार किया जा रहा है",
+        "waiting": "अनुवाद तैयार किया जा रहा है",
         "select_hint": "कृपया अपनी भाषा चुनें",
-        "ended": "परामर्श समाप्त हो गया",
-        "thanks": "आपके आने के लिए धन्यवाद",
+        "ended": "बातचीत समाप्त हो गई",
+        "thanks": "यात्रा के लिए धन्यवाद",
     },
     "ne": {
-        "staff": "परामर्शदाता",
-        "patient": "बिरामी",
+        "staff": "चालक",
+        "patient": "यात्रु",
         "listening": "सुन्दै",
         "paused": "रोकिएको",
         "connecting": "जडान हुँदै",
         "offline": "जडान टुट्यो",
-        "waiting": "परामर्शको तयारी हुँदैछ",
+        "waiting": "अनुवादको तयारी हुँदैछ",
         "select_hint": "कृपया आफ्नो भाषा छान्नुहोस्",
-        "ended": "परामर्श समाप्त भयो",
-        "thanks": "आउनुभएकोमा धन्यवाद",
+        "ended": "कुराकानी समाप्त भयो",
+        "thanks": "यात्राको लागि धन्यवाद",
     },
     "km": {
-        "staff": "អ្នកប្រឹក្សា",
-        "patient": "អ្នកជំងឺ",
+        "staff": "អ្នកបើកបរ",
+        "patient": "អ្នកដំណើរ",
         "listening": "កំពុងស្តាប់",
         "paused": "បានផ្អាក",
         "connecting": "កំពុងតភ្ជាប់",
         "offline": "ការតភ្ជាប់ត្រូវបានផ្តាច់",
-        "waiting": "កំពុងរៀបចំការប្រឹក្សា",
+        "waiting": "កំពុងរៀបចំការបកប្រែ",
         "select_hint": "សូមជ្រើសរើសភាសារបស់អ្នក",
-        "ended": "ការប្រឹក្សាបានបញ្ចប់",
-        "thanks": "អរគុណសម្រាប់ការមកទស្សនា",
+        "ended": "ការសន្ទនាបានបញ្ចប់",
+        "thanks": "អរគុណសម្រាប់ការធ្វើដំណើរ",
     },
     "my": {
-        "staff": "အတိုင်ပင်ခံဝန်ထမ်း",
-        "patient": "လူနာ",
+        "staff": "ကားမောင်းသူ",
+        "patient": "ခရီးသည်",
         "listening": "နားထောင်နေသည်",
         "paused": "ခေတ္တရပ်ထားသည်",
         "connecting": "ချိတ်ဆက်နေသည်",
         "offline": "ချိတ်ဆက်မှု ပြတ်တောက်သွားသည်",
-        "waiting": "ဆွေးနွေးမှုကို ပြင်ဆင်နေပါသည်",
+        "waiting": "ဘာသာပြန်ကို ပြင်ဆင်နေပါသည်",
         "select_hint": "သင်အသုံးပြုမည့် ဘာသာစကားကို ရွေးချယ်ပါ",
-        "ended": "ဆွေးနွေးမှု ပြီးဆုံးပါပြီ",
-        "thanks": "လာရောက်သည့်အတွက် ကျေးဇူးတင်ပါသည်",
+        "ended": "စကားဝိုင်း ပြီးဆုံးပါပြီ",
+        "thanks": "စီးနင်းသည့်အတွက် ကျေးဇူးတင်ပါသည်",
     },
 }
 
@@ -482,6 +485,19 @@ def _b(key: str, default: bool) -> bool:
 def _choice(key: str, default: str, allowed: tuple[str, ...]) -> str:
     value = _s(key, default).lower()
     return value if value in allowed else default
+
+
+def _floats(key: str, default: tuple[float, ...]) -> tuple[float, ...]:
+    """쉼표로 나열한 실수를 읽는다. 하나라도 숫자가 아니면 기본값을 쓴다."""
+    raw = _s(key)
+    if not raw:
+        return default
+    try:
+        values = tuple(float(x.strip()) for x in raw.split(",") if x.strip())
+    except ValueError:
+        log.warning("%s 를 읽지 못해 기본값을 씁니다: %s", key, raw)
+        return default
+    return values or default
 
 
 def _langs(key: str, default: tuple[str, ...]) -> tuple[str, ...]:
@@ -519,6 +535,12 @@ class Settings:
     stt_workers: int = 2
     stt_beam_size: int = 5
     stt_beam_size_partial: int = 1
+    # 확정 전사의 온도 후퇴 단계. 값이 하나면 후퇴가 없다.
+    # 여러 단계를 두면 모델이 자신 없는 발화에서 빔 탐색이 같은 말을 되풀이하며
+    # 무너질 때 whisper 가 다음 온도로 다시 디코딩한다. 사투리·비표준 발화를 건지는
+    # 데는 도움이 되지만 실패한 구간마다 추가 디코딩이 붙어 지연이 늘어난다.
+    # 표준어를 기준으로 지연을 재는 동안은 후퇴 없이 고정해 둔다.
+    stt_temperatures: tuple[float, ...] = (0.0,)
     # 발화 중 중간 자막 주기(초). 0 이면 중간 자막을 만들지 않는다.
     partial_interval_sec: float = 1.2
     min_utterance_sec: float = 0.4
@@ -546,10 +568,26 @@ class Settings:
     vllm_max_tokens: int = 512
     history_turns: int = 3
 
+    # --- 방언 (한국어 화자 쪽에만 적용) ---
+    # `data/dialect/<이름>.json` 의 이름. `off` 면 방언 보정을 끈다.
+    #
+    # 기본은 꺼짐이다. 표준어를 기준으로 인식·번역을 먼저 맞춰 두고, 그 기준선과
+    # 비교할 수 있게 된 뒤에 `gyeongsang` 으로 올린다. 켜면 세 곳이 함께 달라진다.
+    # whisper initial_prompt 에 사투리 표기가 붙고, 원문에 나온 방언의 뜻풀이가
+    # 번역 프롬프트에 실리고, 번역 지시문에 사투리 문단이 하나 추가된다.
+    ko_dialect: str = "off"
+    dialect_path: str = ""
+    # whisper initial_prompt 에 섞을 사투리 예시 수. 용어집 프롬프트와 224 토큰을
+    # 나눠 쓰므로 넉넉히 잡으면 용어가 밀린다.
+    dialect_prompt_words: int = 8
+    # 번역 프롬프트에 붙일 뜻풀이 수의 상한.
+    dialect_max_notes: int = 8
+
     # --- 전문용어 ---
     glossary_path: str = ""
-    # whisper initial_prompt 는 224 토큰까지만 반영된다. 넣을 용어 수를 제한한다.
-    glossary_prompt_terms: int = 32
+    # whisper initial_prompt 는 224 토큰까지만 반영된다. 지명은 한 개가 길어서 24개면
+    # 한도에 가깝다. 넣을 용어 수를 제한한다.
+    glossary_prompt_terms: int = 24
 
     # --- 대화기록 ---
     session_dir: str = "/srv/taxitalk/data/sessions"
@@ -563,7 +601,7 @@ class Settings:
     base_path: str = ""
     app_api_key: str = ""
     clinic_name: str = ""
-    # 시작 화면에 카드로 뜨는 언어. 고객이 고를 수 있는 것은 이 카드뿐이다.
+    # 시작 화면에 카드로 뜨는 언어. 탑승객이 고를 수 있는 것은 이 카드뿐이다.
     patient_languages: tuple[str, ...] = field(
         default_factory=lambda: DEFAULT_PATIENT_LANGUAGES
     )
@@ -587,6 +625,7 @@ class Settings:
             stt_workers=_i("STT_WORKERS", 2),
             stt_beam_size=_i("STT_BEAM_SIZE", 5),
             stt_beam_size_partial=_i("STT_BEAM_SIZE_PARTIAL", 1),
+            stt_temperatures=_floats("STT_TEMPERATURES", (0.0,)),
             partial_interval_sec=_f("PARTIAL_INTERVAL_SEC", 1.2),
             min_utterance_sec=_f("MIN_UTTERANCE_SEC", 0.4),
             max_utterance_sec=_f("MAX_UTTERANCE_SEC", 60.0),
@@ -603,8 +642,12 @@ class Settings:
             vllm_temperature=_f("VLLM_TEMPERATURE", 0.2),
             vllm_max_tokens=_i("VLLM_MAX_TOKENS", 512),
             history_turns=_i("HISTORY_TURNS", 3),
+            ko_dialect=_s("KO_DIALECT", "off").lower(),
+            dialect_path=_s("DIALECT_PATH"),
+            dialect_prompt_words=_i("DIALECT_PROMPT_WORDS", 8),
+            dialect_max_notes=_i("DIALECT_MAX_NOTES", 8),
             glossary_path=_s("GLOSSARY_PATH"),
-            glossary_prompt_terms=_i("GLOSSARY_PROMPT_TERMS", 32),
+            glossary_prompt_terms=_i("GLOSSARY_PROMPT_TERMS", 24),
             session_dir=_s("SESSION_DIR", "/srv/taxitalk/data/sessions"),
             session_list_limit=_i("SESSION_LIST_LIMIT", 50),
             mic_mode=_choice("MIC_MODE", "single", MIC_MODES),
@@ -623,13 +666,13 @@ def lang_name(code: str) -> str:
 
 
 def lang_label(code: str) -> str:
-    """원어 표기(고객이 읽을 자리용)."""
+    """원어 표기(탑승객이 읽을 자리용)."""
     code = (code or "").lower()
     return LANG_LABELS.get(code, code.upper())
 
 
 def lang_label_ko(code: str) -> str:
-    """한국어 표기(대화원이 읽을 자리용)."""
+    """한국어 표기(기사가 읽을 자리용)."""
     code = (code or "").lower()
     return LANG_LABELS_KO.get(code, code.upper())
 

@@ -20,7 +20,7 @@ const CARD_MAX = 15;
 // 오인식이 잦은 실험 등급만 카드와 토스트로 알린다.
 const TIER_EXPERIMENTAL = 3;
 
-// 고객 화면 안내 문구는 한 번에 이만큼만 띄우고 나머지는 돌려 가며 보여준다.
+// 탑승객 화면 안내 문구는 한 번에 이만큼만 띄우고 나머지는 돌려 가며 보여준다.
 const HINTS_PER_PAGE = 4;
 const HINT_ROTATE_MS = 4200;
 
@@ -259,7 +259,7 @@ class taxitalk {
     return (code && this.languages.get(code)) || null;
   }
 
-  // 카드 순서는 서버의 `PATIENT_LANGUAGES` 를 그대로 따른다. 고객이 늘 같은 자리에서
+  // 카드 순서는 서버의 `PATIENT_LANGUAGES` 를 그대로 따른다. 탑승객이 늘 같은 자리에서
   // 자기 언어를 찾도록 대화 이력에 따라 자리를 바꾸지 않는다.
   cardCodes() {
     return this.featured.slice(0, CARD_MAX);
@@ -285,8 +285,8 @@ class taxitalk {
     this.el.langs.append(note);
   }
 
-  /* 국기를 위, 그 언어 표기를 가운데, 한국어 표기를 아래에 둔다. 고객이 보고 누르는
-     카드지만 옆에 선 대화원도 같은 카드를 읽어야 해서 한국어를 함께 싣는다. 실험
+  /* 국기를 위, 그 언어 표기를 가운데, 한국어 표기를 아래에 둔다. 탑승객이 보고 누르는
+     카드지만 옆에 선 기사도 같은 카드를 읽어야 해서 한국어를 함께 싣는다. 실험
      등급은 경고를 남겨야 하므로 등급만 작게 덧붙인다. */
   languageCard(lang) {
     const card = document.createElement('button');
@@ -319,7 +319,7 @@ class taxitalk {
     return card;
   }
 
-  /* 고객 화면 안내. 언어가 많아 한 번에 다 띄우면 읽히지 않으므로 넘겨 가며 보여준다. */
+  /* 탑승객 화면 안내. 언어가 많아 한 번에 다 띄우면 읽히지 않으므로 넘겨 가며 보여준다. */
   buildHints() {
     clearInterval(this.hintTimer);
     this.hintTimer = null;
@@ -390,7 +390,7 @@ class taxitalk {
     return this.langInfo(this.session ? this.session.patient_lang : null);
   }
 
-  // 모니터 하나를 대화원과 고객이 같이 보는 배치. 어느 한쪽 언어를 크게 둘 수 없으니
+  // 모니터 하나를 기사와 탑승객이 같이 보는 배치. 어느 한쪽 언어를 크게 둘 수 없으니
   // 발화마다 들을 사람 쪽으로 기울여 그린다.
   merged() {
     return this.el.body.dataset.layout === 'single';
@@ -424,7 +424,7 @@ class taxitalk {
     });
   }
 
-  // 고객 화면 전체에 언어를 걸어 브라우저가 맞는 글꼴을 고르게 하고, 아랍어처럼
+  // 탑승객 화면 전체에 언어를 걸어 브라우저가 맞는 글꼴을 고르게 하고, 아랍어처럼
   // 오른쪽에서 왼쪽으로 쓰는 언어면 글 방향까지 뒤집는다.
   setPatientLocale(lang) {
     const root = this.el.screens.patient.root;
@@ -446,7 +446,7 @@ class taxitalk {
     this.updatePauseLabel();
     this.el.micNote.textContent =
       this.micMode === 'dual'
-        ? '마이크 2개 모드입니다. 설정에서 대화원용·고객용 입력장치를 확인해 주세요.'
+        ? '마이크 2개 모드입니다. 설정에서 기사용·탑승객용 입력장치를 확인해 주세요.'
         : '공용 마이크 1개 모드입니다. 말하는 언어로 화자를 구분합니다.';
     for (const card of $$('.lang-card')) card.disabled = false;
   }
@@ -462,7 +462,7 @@ class taxitalk {
       if (!response.ok) throw new Error(`session ${response.status}`);
       this.session = await response.json();
     } catch (err) {
-      this.toast(`대화을 시작하지 못했습니다: ${err.message}`, 'error');
+      this.toast(`대화를 시작하지 못했습니다: ${err.message}`, 'error');
       for (const card of $$('.lang-card')) card.disabled = false;
       return;
     }
@@ -497,7 +497,7 @@ class taxitalk {
   async finishConsult(target) {
     const ending = target === 'ended';
     const ok = await this.confirm({
-      title: ending ? '대화을 종료할까요?' : '언어를 바꿀까요?',
+      title: ending ? '대화를 종료할까요?' : '언어를 바꿀까요?',
       body: ending
         ? '대화 내용이 저장되고 다운로드 버튼이 나타납니다.'
         : '지금까지의 대화가 저장되고 언어 선택 화면으로 돌아갑니다.',
@@ -545,13 +545,13 @@ class taxitalk {
   }
 
   /* 대화 중이든 종료 화면이든 언제나 첫 화면(언어 선택)으로 돌아간다.
-     대화을 접고 다음 손님을 받는 버튼이라 종료 처리도 다운로드도 거치지 않는다.
+     대화를 접고 다음 손님을 받는 버튼이라 종료 처리도 다운로드도 거치지 않는다.
      서버에 이미 쌓인 대화는 그대로 두고 화면만 비운다. */
   async goHome() {
     if (this.session) {
       const ok = await this.confirm({
         title: '처음 화면으로 돌아갈까요?',
-        body: '진행 중인 대화을 종료 처리 없이 중단하고 화면의 대화 내용을 지웁니다.',
+        body: '진행 중인 대화를 종료 처리 없이 중단하고 화면의 대화 내용을 지웁니다.',
         confirmText: '홈으로',
         danger: true,
       });
@@ -873,13 +873,13 @@ class taxitalk {
     if (this.merged()) {
       if (turn.speaker === 'unknown') return '인식 중';
       // 두 사람이 같은 화면을 보므로 서로 자기 말로 화자를 알아볼 수 있게 나란히 적는다.
-      const ko = turn.speaker === 'staff' ? '대화원' : '고객';
+      const ko = turn.speaker === 'staff' ? '택시기사' : '탑승객';
       const theirs = ui ? (turn.speaker === 'staff' ? ui.staff : ui.patient) : '';
       return theirs && theirs !== ko ? `${ko} · ${theirs}` : ko;
     }
     if (turn.speaker === 'unknown') return screen === 'staff' ? '인식 중' : '…';
-    if (screen === 'staff') return turn.speaker === 'staff' ? '대화원' : '고객';
-    if (!ui) return turn.speaker === 'staff' ? 'Staff' : 'Patient';
+    if (screen === 'staff') return turn.speaker === 'staff' ? '택시기사' : '탑승객';
+    if (!ui) return turn.speaker === 'staff' ? 'Driver' : 'Passenger';
     return turn.speaker === 'staff' ? ui.staff : ui.patient;
   }
 
@@ -901,7 +901,7 @@ class taxitalk {
 
   renderTurn(turn) {
     const lang = this.lang();
-    // 고객 언어 쪽 줄에만 그 언어를 걸어 준다. 화면 방향과 무관하게 한국어 줄은
+    // 탑승객 언어 쪽 줄에만 그 언어를 걸어 준다. 화면 방향과 무관하게 한국어 줄은
     // 늘 왼쪽에서 오른쪽으로 읽혀야 한다.
     const foreign = { lang: lang ? lang.code : '', dir: lang && lang.rtl ? 'rtl' : 'ltr' };
     const korean = { lang: STAFF_LANG, dir: 'ltr' };
@@ -1000,7 +1000,7 @@ class taxitalk {
     const wrap = document.createElement('div');
     wrap.innerHTML = `
       <h2>마이크 설정</h2>
-      <p>장치 이름이 비어 있으면 먼저 대화을 시작해 마이크 권한을 허용해 주세요.</p>
+      <p>장치 이름이 비어 있으면 먼저 대화를 시작해 마이크 권한을 허용해 주세요.</p>
       <div class="field">
         <label>입력 방식</label>
         <div class="radio-row">
@@ -1015,11 +1015,11 @@ class taxitalk {
         <select data-device="shared"></select>
       </div>
       <div class="field" data-dual hidden>
-        <label>대화원 마이크</label>
+        <label>기사 마이크</label>
         <select data-device="staff"></select>
       </div>
       <div class="field" data-dual hidden>
-        <label>고객 마이크</label>
+        <label>탑승객 마이크</label>
         <select data-device="patient"></select>
       </div>
       <div class="sheet-actions">

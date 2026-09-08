@@ -1,317 +1,947 @@
 {
-  "version": 2,
-  "note": "성형외과·피부과 대화 전문용어. forms 는 13개 언어(ko/en/zh/yue/ja/vi/ru/th/mn/uz/ar/es/id)를 채웠고, 여기에 없는 언어는 번역 모델의 일반 지식에 맡긴다. alias 는 STT 가 실제로 자주 잘못 받아쓰는 표기만 넣고 canonical 형태로 되돌린다. 무르게 잡으면 멀쩡한 말이 바뀐다.",
+  "version": 4,
+  "note": "부산 관광투어 지명·용어. 두 묶음으로 나뉜다. (1) 지명·시설·호텔·쇼핑 고유명사 95개는 `부산 지명 관련 번역` 표기표를 그대로 옮겼고 ko/en/zh/yue/ja 만 채운다. 광둥어는 표기표에 없어 간체를 번체로 옮겼다. `romanized: true` 를 달아 두면 라틴 문자권(vi/es/id/ms/fr/de/uz…)에서는 en 의 공식 로마자를 그대로 쓰므로 같은 값을 열 번 적지 않는다. 러시아어·태국어·아랍어·몽골어 표기는 확정본이 없어 비워 두었고, 그 언어는 번역 모델의 일반 지식에 맡긴다. (2) 요금·차량·일정 같은 운행 용어 29개는 13개 언어(ko/en/zh/yue/ja/vi/ru/th/mn/uz/ar/es/id)를 채웠다. alias 는 STT 가 실제로 자주 흘리는 표기(띄어쓰기·줄여 부르는 이름)만 넣어 확정 표기로 되돌린다. 무르게 잡으면 멀쩡한 말이 바뀐다.",
   "terms": [
-    {
-      "id": "botox",
-      "priority": 10,
+
+    { "id": "haeundae_beach", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "보톡스", "en": "Botox", "zh": "肉毒素", "yue": "肉毒素", "ja": "ボトックス",
-        "vi": "Botox", "ru": "ботокс", "th": "โบท็อกซ์", "mn": "ботокс",
-        "uz": "Botoks", "ar": "البوتوكس", "es": "bótox", "id": "Botox"
+        "ko": "해운대해수욕장", "en": "Haeundae Beach",
+        "zh": "海云台海水浴场", "yue": "海雲台海水浴場", "ja": "海雲台海水浴場"
       },
-      "alias": { "ko": ["보독스", "보톡"], "en": ["botulinum toxin"] }
-    },
-    {
-      "id": "filler",
-      "priority": 10,
+      "alias": { "ko": ["해운대 해수욕장", "해운대 비치"] } },
+
+    { "id": "gwangalli_beach", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "필러", "en": "filler", "zh": "填充剂", "yue": "填充劑", "ja": "フィラー",
-        "vi": "filler", "ru": "филлер", "th": "ฟิลเลอร์", "mn": "филлер",
-        "uz": "filler", "ar": "الفيلر", "es": "relleno dérmico", "id": "filler"
+        "ko": "광안리해수욕장", "en": "Gwangalli Beach",
+        "zh": "广安里海水浴场", "yue": "廣安里海水浴場", "ja": "広安里海水浴場"
       },
-      "alias": { "ko": ["피러"] }
-    },
-    {
-      "id": "ultherapy",
-      "priority": 10,
+      "alias": { "ko": ["광안리 해수욕장", "광안리 비치"] } },
+
+    { "id": "gwangandaegyo", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "울쎄라", "en": "Ultherapy", "zh": "超声刀", "yue": "超聲刀", "ja": "ウルセラ",
-        "vi": "Ultherapy", "ru": "Ultherapy", "th": "Ultherapy", "mn": "Ultherapy",
-        "uz": "Ultherapy", "ar": "ألثيرابي", "es": "Ultherapy", "id": "Ultherapy"
+        "ko": "광안대교", "en": "Gwangandaegyo Bridge",
+        "zh": "广安大桥", "yue": "廣安大橋", "ja": "広安大橋"
       },
-      "alias": { "ko": ["울세라", "울쓰라", "울쎄라리프팅"] }
-    },
-    {
-      "id": "thermage",
-      "priority": 10,
+      "alias": { "ko": ["광안 대교"] } },
+
+    { "id": "gamcheon_village", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "써마지", "en": "Thermage", "zh": "热玛吉", "yue": "熱瑪吉", "ja": "サーマクール",
-        "vi": "Thermage", "ru": "Thermage", "th": "Thermage", "mn": "Thermage",
-        "uz": "Thermage", "ar": "ثيرماج", "es": "Thermage", "id": "Thermage"
+        "ko": "감천문화마을", "en": "Gamcheon Culture Village",
+        "zh": "甘川文化村", "yue": "甘川文化村", "ja": "甘川文化村"
       },
-      "alias": { "ko": ["서마지", "쎄마지"] }
-    },
-    {
-      "id": "inmode",
-      "priority": 9,
+      "alias": { "ko": ["감천 문화마을", "감천문화 마을"] } },
+
+    { "id": "huinnyeoul_village", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "인모드", "en": "InMode", "zh": "InMode", "yue": "InMode", "ja": "インモード",
-        "vi": "InMode", "ru": "InMode", "th": "InMode", "mn": "InMode",
-        "uz": "InMode", "ar": "إنمود", "es": "InMode", "id": "InMode"
+        "ko": "흰여울문화마을", "en": "Huinnyeoul Culture Village",
+        "zh": "白浅文化村", "yue": "白淺文化村", "ja": "ヒンヨウル文化村"
       },
-      "alias": { "ko": ["인모두"] }
-    },
-    {
-      "id": "lifting",
-      "priority": 8,
+      "alias": { "ko": ["흰여울 문화마을", "힌여울문화마을", "흰여울 마을"] } },
+
+    { "id": "jagalchi_market", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "리프팅", "en": "lifting", "zh": "提升", "yue": "提升", "ja": "リフティング",
-        "vi": "nâng cơ", "ru": "лифтинг", "th": "ยกกระชับ", "mn": "арьс чангалах",
-        "uz": "lifting", "ar": "شد البشرة", "es": "lifting", "id": "pengencangan kulit"
+        "ko": "자갈치시장", "en": "Jagalchi Market",
+        "zh": "札嘎其市场", "yue": "札嘎其市場", "ja": "チャガルチ市場"
       },
-      "alias": {}
-    },
-    {
-      "id": "pigmentation",
-      "priority": 8,
+      "alias": { "ko": ["자갈치 시장"] } },
+
+    { "id": "gukje_market", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "색소침착", "en": "pigmentation", "zh": "色素沉着", "yue": "色素沉著", "ja": "色素沈着",
-        "vi": "tăng sắc tố", "ru": "пигментация", "th": "จุดด่างดำ", "mn": "пигментаци",
-        "uz": "pigmentatsiya", "ar": "التصبغات", "es": "hiperpigmentación", "id": "hiperpigmentasi"
+        "ko": "국제시장", "en": "Gukje Market",
+        "zh": "国际市场", "yue": "國際市場", "ja": "国際市場"
       },
-      "alias": { "ko": ["색소 침착"] }
-    },
-    {
-      "id": "melasma",
-      "priority": 8,
+      "alias": { "ko": ["국제 시장"] } },
+
+    { "id": "bupyeong_kkangtong_market", "priority": 9, "romanized": true,
       "forms": {
-        "ko": "기미", "en": "melasma", "zh": "黄褐斑", "yue": "黃褐斑", "ja": "しみ",
-        "vi": "nám da", "ru": "мелазма", "th": "ฝ้า", "mn": "мелазм",
-        "uz": "melazma", "ar": "الكلف", "es": "melasma", "id": "melasma"
+        "ko": "부평깡통시장", "en": "Bupyeong Kkangtong Market",
+        "zh": "富平罐头市场", "yue": "富平罐頭市場", "ja": "富平カントン市場"
       },
-      "alias": {}
-    },
-    {
-      "id": "swelling",
-      "priority": 9,
+      "alias": { "ko": ["부평 깡통시장", "깡통시장"] } },
+
+    { "id": "biff_square", "priority": 9, "romanized": true,
       "forms": {
-        "ko": "붓기", "en": "swelling", "zh": "肿胀", "yue": "腫脹", "ja": "むくみ",
-        "vi": "sưng", "ru": "отёк", "th": "อาการบวม", "mn": "хавдалт",
-        "uz": "shish", "ar": "التورم", "es": "hinchazón", "id": "pembengkakan"
+        "ko": "BIFF광장", "en": "BIFF Square",
+        "zh": "BIFF广场", "yue": "BIFF廣場", "ja": "BIFF広場"
       },
-      "alias": { "ko": ["부기"] }
-    },
-    {
-      "id": "bruising",
-      "priority": 9,
+      "alias": { "ko": ["BIFF 광장", "비프광장", "비프 광장"] } },
+
+    { "id": "yongdusan_park", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "멍", "en": "bruising", "zh": "淤青", "yue": "瘀青", "ja": "内出血",
-        "vi": "bầm tím", "ru": "синяки", "th": "รอยช้ำ", "mn": "хөхрөлт",
-        "uz": "koʻkarish", "ar": "الكدمات", "es": "hematomas", "id": "memar"
+        "ko": "용두산공원", "en": "Yongdusan Park",
+        "zh": "龙头山公园", "yue": "龍頭山公園", "ja": "龍頭山公園"
       },
-      "alias": {}
-    },
-    {
-      "id": "anesthesia",
-      "priority": 9,
+      "alias": { "ko": ["용두산 공원"] } },
+
+    { "id": "busan_tower", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "마취", "en": "anesthesia", "zh": "麻醉", "yue": "麻醉", "ja": "麻酔",
-        "vi": "gây tê", "ru": "анестезия", "th": "การวางยาชา", "mn": "мэдээ алдуулалт",
-        "uz": "anesteziya", "ar": "التخدير", "es": "anestesia", "id": "anestesi"
+        "ko": "부산타워", "en": "Busan Tower",
+        "zh": "釜山塔", "yue": "釜山塔", "ja": "釜山タワー"
       },
-      "alias": {}
-    },
-    {
-      "id": "downtime",
-      "priority": 10,
+      "alias": { "ko": ["부산 타워"] } },
+
+    { "id": "taejongdae", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "회복기간", "en": "downtime", "zh": "恢复期", "yue": "恢復期", "ja": "ダウンタイム",
-        "vi": "thời gian hồi phục", "ru": "период восстановления", "th": "ระยะพักฟื้น",
-        "mn": "сэргэх хугацаа", "uz": "tiklanish davri", "ar": "فترة التعافي",
-        "es": "tiempo de recuperación", "id": "masa pemulihan"
+        "ko": "태종대", "en": "Taejongdae Resort Park",
+        "zh": "太宗台", "yue": "太宗台", "ja": "太宗台"
       },
-      "alias": { "ko": ["회복 기간", "다운타임"] }
-    },
-    {
-      "id": "double_eyelid",
-      "priority": 10,
+      "alias": { "ko": ["태종대공원", "태종대 공원"] } },
+
+    { "id": "songdo_beach", "priority": 9, "romanized": true,
       "forms": {
-        "ko": "쌍꺼풀", "en": "double eyelid surgery", "zh": "双眼皮", "yue": "雙眼皮", "ja": "二重まぶた",
-        "vi": "cắt mí", "ru": "пластика двойного века", "th": "ทำตาสองชั้น",
-        "mn": "давхар зовхи", "uz": "qoʻsh qovoq operatsiyasi", "ar": "جراحة الجفن المزدوج",
-        "es": "cirugía de doble párpado", "id": "operasi kelopak mata ganda"
+        "ko": "송도해수욕장", "en": "Songdo Beach",
+        "zh": "松岛海水浴场", "yue": "松島海水浴場", "ja": "松島海水浴場"
       },
-      "alias": { "ko": ["쌍커풀", "쌍꺼플"] }
-    },
-    {
-      "id": "rhinoplasty",
-      "priority": 10,
+      "alias": { "ko": ["송도 해수욕장"] } },
+
+    { "id": "songdo_cable_car", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "코성형", "en": "rhinoplasty", "zh": "隆鼻", "yue": "隆鼻", "ja": "鼻整形",
-        "vi": "nâng mũi", "ru": "ринопластика", "th": "เสริมจมูก", "mn": "хамрын гоо засал",
-        "uz": "rinoplastika", "ar": "تجميل الأنف", "es": "rinoplastia", "id": "operasi hidung"
+        "ko": "송도해상케이블카", "en": "Songdo Marine Cable Car",
+        "zh": "松岛海上缆车", "yue": "松島海上纜車", "ja": "松島海上ケーブルカー"
       },
-      "alias": { "ko": ["코 성형"] }
-    },
-    {
-      "id": "liposuction",
-      "priority": 10,
+      "alias": { "ko": ["송도 해상케이블카", "송도해상 케이블카", "송도 케이블카"] } },
+
+    { "id": "haedong_yonggungsa", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "지방흡입", "en": "liposuction", "zh": "吸脂", "yue": "抽脂", "ja": "脂肪吸引",
-        "vi": "hút mỡ", "ru": "липосакция", "th": "ดูดไขมัน", "mn": "өөх сорох",
-        "uz": "liposaksiya", "ar": "شفط الدهون", "es": "liposucción", "id": "sedot lemak"
+        "ko": "해동용궁사", "en": "Haedong Yonggungsa Temple",
+        "zh": "海东龙宫寺", "yue": "海東龍宮寺", "ja": "海東龍宮寺"
       },
-      "alias": { "ko": ["지방 흡입"] }
-    },
-    {
-      "id": "thread_lift",
-      "priority": 8,
+      "alias": { "ko": ["해동 용궁사", "용궁사"] } },
+
+    { "id": "oryukdo_skywalk", "priority": 9, "romanized": true,
       "forms": {
-        "ko": "실리프팅", "en": "thread lift", "zh": "线雕", "yue": "線雕", "ja": "糸リフト",
-        "vi": "căng chỉ", "ru": "нитевой лифтинг", "th": "ร้อยไหม", "mn": "утсан лифтинг",
-        "uz": "ip bilan tortish", "ar": "شد الوجه بالخيوط", "es": "hilos tensores",
-        "id": "tanam benang"
+        "ko": "오륙도 스카이워크", "en": "Oryukdo Skywalk",
+        "zh": "五六岛天空步道", "yue": "五六島天空步道", "ja": "五六島スカイウォーク"
       },
-      "alias": { "ko": ["실 리프팅"] }
-    },
-    {
-      "id": "skin_booster",
-      "priority": 8,
+      "alias": { "ko": ["오륙도스카이워크", "오륙도 스카이 워크"] } },
+
+    { "id": "oryukdo", "priority": 10, "romanized": true,
       "forms": {
-        "ko": "스킨부스터", "en": "skin booster", "zh": "水光针", "yue": "水光針", "ja": "スキンブースター",
-        "vi": "tiêm dưỡng da", "ru": "скинбустер", "th": "สกินบูสเตอร์", "mn": "скин бустер",
-        "uz": "skin buster", "ar": "سكين بوستر", "es": "skin booster", "id": "skin booster"
+        "ko": "오륙도", "en": "Oryukdo Islands",
+        "zh": "五六岛", "yue": "五六島", "ja": "五六島"
       },
-      "alias": { "ko": ["스킨 부스터", "물광주사"] }
-    },
-    {
-      "id": "laser_toning",
-      "priority": 7,
+      "alias": {} },
+
+    { "id": "igidae_coastal_walk", "priority": 8, "romanized": true,
       "forms": {
-        "ko": "레이저토닝", "en": "laser toning", "zh": "镭射净肤", "yue": "激光淨膚", "ja": "レーザートーニング",
-        "vi": "laser toning", "ru": "лазерный тонинг", "th": "เลเซอร์โทนนิ่ง",
-        "mn": "лазер тонинг", "uz": "lazer toning", "ar": "ليزر التونينغ",
-        "es": "láser toning", "id": "laser toning"
+        "ko": "이기대 해안산책로", "en": "Igidae Coastal Walk",
+        "zh": "二妓台海岸步道", "yue": "二妓台海岸步道", "ja": "二妓台海岸散策路"
       },
-      "alias": { "ko": ["레이저 토닝"] }
-    },
-    {
-      "id": "fat_graft",
-      "priority": 7,
+      "alias": { "ko": ["이기대해안산책로", "이기대 해안 산책로", "이기대"] } },
+
+    { "id": "dongbaekseom", "priority": 9, "romanized": true,
       "forms": {
-        "ko": "지방이식", "en": "fat grafting", "zh": "脂肪移植", "yue": "脂肪移植", "ja": "脂肪移植",
-        "vi": "cấy mỡ tự thân", "ru": "липофилинг", "th": "ฉีดไขมัน",
-        "mn": "өөх шилжүүлэн суулгах", "uz": "yogʻ koʻchirib oʻtkazish", "ar": "نقل الدهون",
-        "es": "injerto de grasa", "id": "cangkok lemak"
+        "ko": "동백섬", "en": "Dongbaekseom Island",
+        "zh": "冬柏岛", "yue": "冬柏島", "ja": "冬柏島"
       },
-      "alias": { "ko": ["지방 이식"] }
-    },
-    {
-      "id": "acne",
-      "priority": 7,
+      "alias": { "ko": ["동백 섬"] } },
+
+    { "id": "nurimaru_apec_house", "priority": 8, "romanized": true,
       "forms": {
-        "ko": "여드름", "en": "acne", "zh": "痤疮", "yue": "暗瘡", "ja": "ニキビ",
-        "vi": "mụn trứng cá", "ru": "акне", "th": "สิว", "mn": "батга",
-        "uz": "husnbuzar", "ar": "حب الشباب", "es": "acné", "id": "jerawat"
+        "ko": "누리마루 APEC 하우스", "en": "Nurimaru APEC House",
+        "zh": "努力马鲁APEC世峰楼", "yue": "努力馬魯APEC世峰樓", "ja": "ヌリマルAPECハウス"
       },
-      "alias": {}
-    },
-    {
-      "id": "pore",
-      "priority": 6,
+      "alias": { "ko": ["누리마루 APEC하우스", "누리마루 아펙하우스", "누리마루"] } },
+
+    { "id": "haeundae_blueline_park", "priority": 9, "romanized": true,
       "forms": {
-        "ko": "모공", "en": "pores", "zh": "毛孔", "yue": "毛孔", "ja": "毛穴",
-        "vi": "lỗ chân lông", "ru": "поры", "th": "รูขุมขน", "mn": "сүв",
-        "uz": "teri teshiklari", "ar": "المسام", "es": "poros", "id": "pori-pori"
+        "ko": "해운대 블루라인파크", "en": "Haeundae Blueline Park",
+        "zh": "海云台蓝线公园", "yue": "海雲台藍線公園", "ja": "海雲台ブルーラインパーク"
       },
-      "alias": {}
-    },
-    {
-      "id": "wrinkle",
-      "priority": 7,
+      "alias": { "ko": ["해운대블루라인파크", "해운대 블루라인 파크", "블루라인파크"] } },
+
+    { "id": "cheongsapo", "priority": 8, "romanized": true,
       "forms": {
-        "ko": "주름", "en": "wrinkles", "zh": "皱纹", "yue": "皺紋", "ja": "しわ",
-        "vi": "nếp nhăn", "ru": "морщины", "th": "ริ้วรอย", "mn": "үрчлээ",
-        "uz": "ajinlar", "ar": "التجاعيد", "es": "arrugas", "id": "kerutan"
+        "ko": "청사포", "en": "Cheongsapo",
+        "zh": "青沙浦", "yue": "青沙浦", "ja": "青沙浦"
       },
-      "alias": {}
-    },
-    {
-      "id": "stitch_removal",
-      "priority": 7,
+      "alias": {} },
+
+    { "id": "cheongsapo_observatory", "priority": 8, "romanized": true,
       "forms": {
-        "ko": "실밥제거", "en": "stitch removal", "zh": "拆线", "yue": "拆線", "ja": "抜糸",
-        "vi": "cắt chỉ", "ru": "снятие швов", "th": "ตัดไหม", "mn": "оёдол авах",
-        "uz": "choklarni olish", "ar": "إزالة الغرز", "es": "retirada de puntos",
-        "id": "lepas jahitan"
+        "ko": "청사포 다릿돌전망대", "en": "Cheongsapo Daritdol Observatory",
+        "zh": "青沙浦踏石观景台", "yue": "青沙浦踏石觀景台", "ja": "青沙浦タリットル展望台"
       },
-      "alias": { "ko": ["실밥 제거", "발사"] }
-    },
-    {
-      "id": "side_effect",
-      "priority": 8,
+      "alias": { "ko": ["청사포다릿돌전망대", "청사포 다릿돌 전망대", "청사포 전망대"] } },
+
+    { "id": "songjeong_beach", "priority": 9, "romanized": true,
       "forms": {
-        "ko": "부작용", "en": "side effects", "zh": "副作用", "yue": "副作用", "ja": "副作用",
-        "vi": "tác dụng phụ", "ru": "побочные эффекты", "th": "ผลข้างเคียง",
-        "mn": "гаж нөлөө", "uz": "nojoʻya taʼsirlar", "ar": "الآثار الجانبية",
-        "es": "efectos secundarios", "id": "efek samping"
+        "ko": "송정해수욕장", "en": "Songjeong Beach",
+        "zh": "松亭海水浴场", "yue": "松亭海水浴場", "ja": "松亭海水浴場"
       },
-      "alias": {}
-    },
-    {
-      "id": "consultation",
-      "priority": 5,
+      "alias": { "ko": ["송정 해수욕장"] } },
+
+    { "id": "dalmajigil", "priority": 8, "romanized": true,
       "forms": {
-        "ko": "대화", "en": "consultation", "zh": "咨询", "yue": "諮詢", "ja": "カウンセリング",
-        "vi": "tư vấn", "ru": "консультация", "th": "การให้คำปรึกษา", "mn": "зөвлөгөө",
-        "uz": "maslahat", "ar": "الاستشارة", "es": "consulta", "id": "konsultasi"
+        "ko": "달맞이길", "en": "Dalmaji-gil Road",
+        "zh": "迎月路", "yue": "迎月路", "ja": "タルマジキル"
       },
-      "alias": {}
-    },
-    {
-      "id": "aftercare",
-      "priority": 7,
+      "alias": { "ko": ["달맞이 길", "달맞이고개"] } },
+
+    { "id": "dadaepo_beach", "priority": 9, "romanized": true,
       "forms": {
-        "ko": "주의사항", "en": "aftercare instructions", "zh": "注意事项", "yue": "注意事項",
-        "ja": "注意事項", "vi": "lưu ý sau điều trị", "ru": "рекомендации после процедуры",
-        "th": "ข้อควรระวังหลังทำ", "mn": "анхаарах зүйлс", "uz": "parvarish boʻyicha koʻrsatmalar",
-        "ar": "تعليمات ما بعد العلاج", "es": "cuidados posteriores", "id": "perawatan pasca tindakan"
+        "ko": "다대포해수욕장", "en": "Dadaepo Beach",
+        "zh": "多大浦海水浴场", "yue": "多大浦海水浴場", "ja": "多大浦海水浴場"
       },
-      "alias": { "ko": ["주의 사항"] }
-    },
-    {
-      "id": "revisit",
-      "priority": 6,
+      "alias": { "ko": ["다대포 해수욕장"] } },
+
+    { "id": "eulsukdo", "priority": 8, "romanized": true,
       "forms": {
-        "ko": "재방문", "en": "follow-up visit", "zh": "复诊", "yue": "覆診", "ja": "再来院",
-        "vi": "tái khám", "ru": "повторный визит", "th": "การนัดติดตามผล",
-        "mn": "дахин ирэх", "uz": "takroriy tashrif", "ar": "زيارة المتابعة",
-        "es": "visita de seguimiento", "id": "kunjungan lanjutan"
+        "ko": "을숙도", "en": "Eulsukdo Island",
+        "zh": "乙淑岛", "yue": "乙淑島", "ja": "乙淑島"
       },
-      "alias": {}
-    },
-    {
-      "id": "sedation",
-      "priority": 7,
+      "alias": {} },
+
+    { "id": "amisan_observatory", "priority": 7, "romanized": true,
       "forms": {
-        "ko": "수면마취", "en": "sedation", "zh": "睡眠麻醉", "yue": "睡眠麻醉", "ja": "睡眠麻酔",
-        "vi": "gây mê", "ru": "седация", "th": "การให้ยานอนหลับ",
-        "mn": "нойрны мэдээ алдуулалт", "uz": "sedatsiya", "ar": "التخدير الوريدي",
-        "es": "sedación", "id": "sedasi"
+        "ko": "아미산전망대", "en": "Amisan Observatory",
+        "zh": "峨嵋山展望台", "yue": "峨嵋山展望台", "ja": "峨嵋山展望台"
       },
-      "alias": { "ko": ["수면 마취"] }
-    },
-    {
-      "id": "local_anesthesia",
-      "priority": 7,
+      "alias": { "ko": ["아미산 전망대"] } },
+
+    { "id": "beomeosa", "priority": 9, "romanized": true,
       "forms": {
-        "ko": "국소마취", "en": "local anesthesia", "zh": "局部麻醉", "yue": "局部麻醉", "ja": "局所麻酔",
-        "vi": "gây tê tại chỗ", "ru": "местная анестезия", "th": "การฉีดยาชาเฉพาะที่",
-        "mn": "хэсэг газрын мэдээ алдуулалт", "uz": "mahalliy anesteziya",
-        "ar": "التخدير الموضعي", "es": "anestesia local", "id": "anestesi lokal"
+        "ko": "범어사", "en": "Beomeosa Temple",
+        "zh": "梵鱼寺", "yue": "梵魚寺", "ja": "梵魚寺"
       },
-      "alias": { "ko": ["국소 마취", "부분마취"] }
-    },
-    {
-      "id": "scar",
-      "priority": 7,
+      "alias": {} },
+
+    { "id": "ahopsan_forest", "priority": 8, "romanized": true,
       "forms": {
-        "ko": "흉터", "en": "scar", "zh": "疤痕", "yue": "疤痕", "ja": "傷跡",
-        "vi": "sẹo", "ru": "рубец", "th": "แผลเป็น", "mn": "сорви",
-        "uz": "chandiq", "ar": "الندبة", "es": "cicatriz", "id": "bekas luka"
+        "ko": "아홉산숲", "en": "Ahopsan Forest",
+        "zh": "九峰山林", "yue": "九峰山林", "ja": "アホプサンの森"
       },
-      "alias": {}
-    }
+      "alias": { "ko": ["아홉산 숲"] } },
+
+    { "id": "busan_citizens_park", "priority": 9, "romanized": true,
+      "forms": {
+        "ko": "부산시민공원", "en": "Busan Citizens Park",
+        "zh": "釜山市民公园", "yue": "釜山市民公園", "ja": "釜山市民公園"
+      },
+      "alias": { "ko": ["부산 시민공원", "시민공원"] } },
+
+    { "id": "busan_childrens_grand_park", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "부산어린이대공원", "en": "Busan Children's Grand Park",
+        "zh": "釜山儿童大公园", "yue": "釜山兒童大公園", "ja": "釜山子ども大公園"
+      },
+      "alias": { "ko": ["부산 어린이대공원", "어린이대공원"] } },
+
+    { "id": "samnak_ecological_park", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "삼락생태공원", "en": "Samnak Ecological Park",
+        "zh": "三乐生态公园", "yue": "三樂生態公園", "ja": "三楽生態公園"
+      },
+      "alias": { "ko": ["삼락 생태공원"] } },
+
+    { "id": "busan_cinema_center", "priority": 10, "romanized": true,
+      "forms": {
+        "ko": "영화의전당", "en": "Busan Cinema Center",
+        "zh": "釜山电影殿堂", "yue": "釜山電影殿堂", "ja": "映画の殿堂"
+      },
+      "alias": { "ko": ["영화의 전당"] } },
+
+    { "id": "bexco", "priority": 9, "romanized": true,
+      "forms": {
+        "ko": "벡스코", "en": "BEXCO",
+        "zh": "釜山会展中心（BEXCO）", "yue": "釜山會展中心（BEXCO）",
+        "ja": "BEXCO（釜山コンベンションセンター）"
+      },
+      "alias": { "ko": ["백스코"] } },
+
+    { "id": "bexco_hall1", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "벡스코 제1전시장", "en": "BEXCO Exhibition Center 1",
+        "zh": "BEXCO 第一展览馆", "yue": "BEXCO 第一展覽館", "ja": "BEXCO 第1展示場"
+      },
+      "alias": { "ko": ["벡스코 1전시장", "벡스코 제1 전시장"] } },
+
+    { "id": "bexco_hall2", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "벡스코 제2전시장", "en": "BEXCO Exhibition Center 2",
+        "zh": "BEXCO 第二展览馆", "yue": "BEXCO 第二展覽館", "ja": "BEXCO 第2展示場"
+      },
+      "alias": { "ko": ["벡스코 2전시장", "벡스코 제2 전시장"] } },
+
+    { "id": "busan_asiad_stadium", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "부산아시아드주경기장", "en": "Busan Asiad Main Stadium",
+        "zh": "釜山亚运会主体育场", "yue": "釜山亞運會主體育場", "ja": "釜山アジアド主競技場"
+      },
+      "alias": { "ko": ["부산 아시아드 주경기장", "아시아드주경기장"] } },
+
+    { "id": "sajik_baseball_stadium", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "사직야구장", "en": "Sajik Baseball Stadium",
+        "zh": "社稷棒球场", "yue": "社稷棒球場", "ja": "社稷野球場"
+      },
+      "alias": { "ko": ["사직 야구장"] } },
+
+    { "id": "jeonpo_cafe_street", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "전포카페거리", "en": "Jeonpo Cafe Street",
+        "zh": "田浦咖啡街", "yue": "田浦咖啡街", "ja": "田浦カフェ通り"
+      },
+      "alias": { "ko": ["전포 카페거리", "전포카페 거리"] } },
+
+    { "id": "seomyeon", "priority": 10, "romanized": true,
+      "forms": {
+        "ko": "서면", "en": "Seomyeon",
+        "zh": "西面", "yue": "西面", "ja": "西面"
+      },
+      "alias": {} },
+
+    { "id": "centum_city", "priority": 10, "romanized": true,
+      "forms": {
+        "ko": "센텀시티", "en": "Centum City",
+        "zh": "Centum City（新世界城）", "yue": "Centum City（新世界城）", "ja": "センタムシティ"
+      },
+      "alias": { "ko": ["센텀 시티"] } },
+
+    { "id": "marine_city", "priority": 9, "romanized": true,
+      "forms": {
+        "ko": "마린시티", "en": "Marine City",
+        "zh": "海洋城市", "yue": "海洋城市", "ja": "マリンシティ"
+      },
+      "alias": { "ko": ["마린 시티"] } },
+
+    { "id": "the_bay_101", "priority": 9, "romanized": true,
+      "forms": {
+        "ko": "더베이101", "en": "The Bay 101",
+        "zh": "The Bay 101", "yue": "The Bay 101", "ja": "ザ・ベイ101"
+      },
+      "alias": { "ko": ["더베이 101", "더 베이 101"] } },
+
+    { "id": "osiria_tourism_complex", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "오시리아 관광단지", "en": "Osiria Tourism Complex",
+        "zh": "OSIRIA旅游区", "yue": "OSIRIA旅遊區", "ja": "オシリア観光団地"
+      },
+      "alias": { "ko": ["오시리아관광단지", "오시리아"] } },
+
+    { "id": "lotte_world_busan", "priority": 9, "romanized": true,
+      "forms": {
+        "ko": "롯데월드 어드벤처 부산", "en": "Lotte World Adventure Busan",
+        "zh": "釜山乐天世界", "yue": "釜山樂天世界", "ja": "ロッテワールド・アドベンチャー釜山"
+      },
+      "alias": { "ko": ["롯데월드 부산", "부산 롯데월드", "롯데월드"] } },
+
+    { "id": "skyline_luge_busan", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "스카이라인 루지 부산", "en": "Skyline Luge Busan",
+        "zh": "釜山Skyline Luge", "yue": "釜山Skyline Luge", "ja": "スカイライン・リュージュ釜山"
+      },
+      "alias": { "ko": ["스카이라인루지 부산", "스카이라인 루지", "루지 부산"] } },
+
+    { "id": "busan_national_science_museum", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "국립부산과학관", "en": "Busan National Science Museum",
+        "zh": "国立釜山科学馆", "yue": "國立釜山科學館", "ja": "国立釜山科学館"
+      },
+      "alias": { "ko": ["국립 부산과학관", "부산과학관"] } },
+
+    { "id": "moca_busan", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "부산현대미술관", "en": "Museum of Contemporary Art Busan",
+        "zh": "釜山现代美术馆", "yue": "釜山現代美術館", "ja": "釜山現代美術館"
+      },
+      "alias": { "ko": ["부산 현대미술관"] } },
+
+    { "id": "busan_museum_of_art", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "부산시립미술관", "en": "Busan Museum of Art",
+        "zh": "釜山市立美术馆", "yue": "釜山市立美術館", "ja": "釜山市立美術館"
+      },
+      "alias": { "ko": ["부산 시립미술관", "시립미술관"] } },
+
+    { "id": "korea_national_maritime_museum", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "국립해양박물관", "en": "Korea National Maritime Museum",
+        "zh": "韩国国立海洋博物馆", "yue": "韓國國立海洋博物館", "ja": "国立海洋博物館"
+      },
+      "alias": { "ko": ["국립 해양박물관", "해양박물관"] } },
+
+    { "id": "busan_museum", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "부산박물관", "en": "Busan Museum",
+        "zh": "釜山博物馆", "yue": "釜山博物館", "ja": "釜山博物館"
+      },
+      "alias": { "ko": ["부산 박물관"] } },
+
+    { "id": "busan_modern_history_museum", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "부산근현대역사관", "en": "Busan Modern and Contemporary History Museum",
+        "zh": "釜山近现代历史馆", "yue": "釜山近現代歷史館", "ja": "釜山近現代歴史館"
+      },
+      "alias": { "ko": ["부산 근현대역사관", "근현대역사관"] } },
+
+    { "id": "un_memorial_cemetery", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "유엔기념공원", "en": "UN Memorial Cemetery in Korea",
+        "zh": "联合国纪念公墓", "yue": "聯合國紀念公墓", "ja": "国連記念公園"
+      },
+      "alias": { "ko": ["유엔 기념공원", "UN기념공원", "유엔공원"] } },
+
+    { "id": "busan_station", "priority": 10, "romanized": true,
+      "forms": {
+        "ko": "부산역", "en": "Busan Station",
+        "zh": "釜山站", "yue": "釜山站", "ja": "釜山駅"
+      },
+      "alias": {} },
+
+    { "id": "gimhae_airport", "priority": 10, "romanized": true,
+      "forms": {
+        "ko": "김해국제공항", "en": "Gimhae International Airport",
+        "zh": "金海国际机场", "yue": "金海國際機場", "ja": "金海国際空港"
+      },
+      "alias": { "ko": ["김해 국제공항", "김해공항", "김해 공항"] } },
+
+    { "id": "busan_port_terminal", "priority": 9, "romanized": true,
+      "forms": {
+        "ko": "부산항국제여객터미널", "en": "Busan Port International Passenger Terminal",
+        "zh": "釜山港国际客运码头", "yue": "釜山港國際客運碼頭", "ja": "釜山港国際旅客ターミナル"
+      },
+      "alias": { "ko": ["부산항 국제여객터미널", "국제여객터미널"] } },
+
+    { "id": "busan_cruise_terminal", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "부산항 북항크루즈터미널", "en": "Busan Port North Port Cruise Terminal",
+        "zh": "釜山港北港邮轮客运站", "yue": "釜山港北港郵輪客運站", "ja": "釜山港北港クルーズターミナル"
+      },
+      "alias": { "ko": ["북항크루즈터미널", "북항 크루즈터미널", "크루즈터미널"] } },
+
+    { "id": "busan_central_bus_terminal", "priority": 9, "romanized": true,
+      "forms": {
+        "ko": "부산종합버스터미널", "en": "Busan Central Bus Terminal",
+        "zh": "釜山综合巴士客运站", "yue": "釜山綜合巴士客運站", "ja": "釜山総合バスターミナル"
+      },
+      "alias": { "ko": ["부산 종합버스터미널", "종합버스터미널"] } },
+
+    { "id": "busan_seobu_bus_terminal", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "부산서부버스터미널", "en": "Busan Seobu Intercity Bus Terminal",
+        "zh": "釜山西部巴士客运站", "yue": "釜山西部巴士客運站", "ja": "釜山西部バスターミナル"
+      },
+      "alias": { "ko": ["부산 서부버스터미널", "서부버스터미널"] } },
+
+    { "id": "busan_city_hall", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "부산시청", "en": "Busan City Hall",
+        "zh": "釜山市政府", "yue": "釜山市政府", "ja": "釜山市庁"
+      },
+      "alias": { "ko": ["부산 시청"] } },
+
+    { "id": "pusan_national_university", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "부산대학교", "en": "Pusan National University",
+        "zh": "釜山大学", "yue": "釜山大學", "ja": "釜山大学"
+      },
+      "alias": { "ko": ["부산대"] } },
+
+    { "id": "pukyong_national_university", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "국립부경대학교", "en": "Pukyong National University",
+        "zh": "国立釜庆大学", "yue": "國立釜慶大學", "ja": "国立釜慶大学"
+      },
+      "alias": { "ko": ["부경대학교", "부경대"] } },
+
+    { "id": "pnu_hospital", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "부산대학교병원", "en": "Pusan National University Hospital",
+        "zh": "釜山大学医院", "yue": "釜山大學醫院", "ja": "釜山大学病院"
+      },
+      "alias": { "ko": ["부산대학교 병원", "부산대병원"] } },
+
+    { "id": "donga_university_hospital", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "동아대학교병원", "en": "Dong-A University Hospital",
+        "zh": "东亚大学医院", "yue": "東亞大學醫院", "ja": "東亜大学病院"
+      },
+      "alias": { "ko": ["동아대학교 병원", "동아대병원"] } },
+
+    { "id": "shinsegae_centum_city", "priority": 9, "romanized": true,
+      "forms": {
+        "ko": "신세계백화점 센텀시티점", "en": "Shinsegae Centum City",
+        "zh": "新世界百货 Centum City店", "yue": "新世界百貨 Centum City店",
+        "ja": "新世界百貨店 センタムシティ店"
+      },
+      "alias": { "ko": ["신세계 센텀시티", "신세계백화점 센텀시티", "센텀시티 신세계"] } },
+
+    { "id": "lotte_busan_main", "priority": 9, "romanized": true,
+      "forms": {
+        "ko": "롯데백화점 부산본점", "en": "Lotte Department Store Busan Main",
+        "zh": "乐天百货釜山总店", "yue": "樂天百貨釜山總店", "ja": "ロッテ百貨店釜山本店"
+      },
+      "alias": { "ko": ["롯데백화점 부산 본점", "롯데 부산본점"] } },
+
+    { "id": "lotte_gwangbok", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "롯데백화점 광복점", "en": "Lotte Department Store Gwangbok",
+        "zh": "乐天百货光复店", "yue": "樂天百貨光復店", "ja": "ロッテ百貨店光復店"
+      },
+      "alias": { "ko": ["롯데백화점 광복", "광복 롯데백화점"] } },
+
+    { "id": "lotte_mall_dongbusan", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "롯데몰 동부산점", "en": "Lotte Mall Dongbusan",
+        "zh": "乐天购物中心东釜山店", "yue": "樂天購物中心東釜山店", "ja": "ロッテモール東釜山店"
+      },
+      "alias": { "ko": ["롯데몰 동부산", "동부산 롯데몰"] } },
+
+    { "id": "busan_premium_outlets", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "부산 프리미엄 아울렛", "en": "Busan Premium Outlets",
+        "zh": "釜山名牌折扣购物中心", "yue": "釜山名牌折扣購物中心", "ja": "釜山プレミアム・アウトレット"
+      },
+      "alias": { "ko": ["부산프리미엄아울렛", "프리미엄 아울렛"] } },
+
+    { "id": "starfield_city_myeongji", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "스타필드시티 명지점", "en": "Starfield City Myeongji",
+        "zh": "Starfield City 明旨店", "yue": "Starfield City 明旨店",
+        "ja": "スターフィールドシティ明旨店"
+      },
+      "alias": { "ko": ["스타필드시티 명지", "스타필드 명지"] } },
+
+    { "id": "seomyeon_underground_mall", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "서면지하도상가 서면몰", "en": "Seomyeon Underground Shopping Center",
+        "zh": "西面地下购物中心", "yue": "西面地下購物中心", "ja": "西面地下ショッピングセンター"
+      },
+      "alias": { "ko": ["서면지하도상가", "서면지하상가", "서면 지하상가", "서면몰"] } },
+
+    { "id": "gwangbokro_fashion_street", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "광복로패션거리", "en": "Gwangbok-ro Fashion Street",
+        "zh": "光复路时尚街", "yue": "光復路時尚街", "ja": "光復路ファッションストリート"
+      },
+      "alias": { "ko": ["광복로 패션거리", "광복동 패션거리"] } },
+
+    { "id": "nampo_underground_mall", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "남포동 지하도상가", "en": "Nampo Underground Shopping Center",
+        "zh": "南浦洞地下购物中心", "yue": "南浦洞地下購物中心", "ja": "南浦洞地下ショッピングセンター"
+      },
+      "alias": { "ko": ["남포동 지하상가", "남포지하상가"] } },
+
+    { "id": "art_malling_busan", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "아트몰링 부산본점", "en": "Art Malling Busan",
+        "zh": "釜山 Art Malling购物中心", "yue": "釜山 Art Malling購物中心",
+        "ja": "アートモーリング釜山"
+      },
+      "alias": { "ko": ["아트몰링 부산", "아트몰링"] } },
+
+    { "id": "signiel_busan", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "시그니엘 부산", "en": "SIGNIEL BUSAN",
+        "zh": "釜山SIGNIEL酒店", "yue": "釜山SIGNIEL酒店", "ja": "シグニエル釜山"
+      },
+      "alias": { "ko": ["시그니엘부산", "시그니엘"] } },
+
+    { "id": "park_hyatt_busan", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "파크 하얏트 부산", "en": "Park Hyatt Busan",
+        "zh": "釜山柏悦酒店", "yue": "釜山柏悅酒店", "ja": "パーク ハイアット 釜山"
+      },
+      "alias": { "ko": ["파크하얏트 부산", "파크 하이엇 부산", "파크하얏트"] } },
+
+    { "id": "paradise_hotel_busan", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "파라다이스 호텔 부산", "en": "Paradise Hotel Busan",
+        "zh": "釜山百乐达斯酒店", "yue": "釜山百樂達斯酒店", "ja": "パラダイスホテル釜山"
+      },
+      "alias": { "ko": ["파라다이스호텔 부산", "파라다이스 호텔", "파라다이스호텔"] } },
+
+    { "id": "westin_josun_busan", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "웨스틴 조선 부산", "en": "The Westin Josun Busan",
+        "zh": "釜山威斯汀朝鲜酒店", "yue": "釜山威斯汀朝鮮酒店", "ja": "ウェスティン朝鮮釜山"
+      },
+      "alias": { "ko": ["더웨스틴조선 부산", "더 웨스틴 조선 부산", "웨스틴조선 부산"] } },
+
+    { "id": "grand_josun_busan", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "그랜드 조선 부산", "en": "Grand Josun Busan",
+        "zh": "釜山朝昕经典酒店", "yue": "釜山朝昕經典酒店", "ja": "グランド朝鮮釜山"
+      },
+      "alias": { "ko": ["그랜드조선 부산", "그랜드 조선"] } },
+
+    { "id": "lotte_hotel_busan", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "롯데호텔 부산", "en": "Lotte Hotel Busan",
+        "zh": "釜山乐天酒店", "yue": "釜山樂天酒店", "ja": "ロッテホテル釜山"
+      },
+      "alias": { "ko": ["롯데 호텔 부산", "롯데호텔"] } },
+
+    { "id": "ananti_cove", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "아난티 앳 부산 코브", "en": "Ananti at Busan Cove",
+        "zh": "釜山安纳帝海湾酒店", "yue": "釜山安納帝海灣酒店", "ja": "アナンティ・アット釜山コーブ"
+      },
+      "alias": { "ko": ["아난티앳부산코브", "아난티 코브"] } },
+
+    { "id": "ananti_village", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "아난티 앳 부산 빌라쥬", "en": "Ananti at Busan Village",
+        "zh": "釜山安纳帝村庄", "yue": "釜山安納帝村莊", "ja": "アナンティ・アット釜山ビレッジ"
+      },
+      "alias": { "ko": ["아난티 빌라쥬", "아난티 빌리지"] } },
+
+    { "id": "wyndham_grand_busan", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "윈덤 그랜드 부산", "en": "Wyndham Grand Busan",
+        "zh": "釜山温德姆至尊酒店", "yue": "釜山溫德姆至尊酒店", "ja": "ウィンダムグランド釜山"
+      },
+      "alias": { "ko": ["윈덤그랜드 부산", "윈담 그랜드 부산"] } },
+
+    { "id": "l7_haeundae", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "L7 해운대 바이 롯데", "en": "L7 Haeundae by Lotte",
+        "zh": "L7海云台乐天酒店", "yue": "L7海雲台樂天酒店", "ja": "L7海雲台 by LOTTE"
+      },
+      "alias": { "ko": ["L7 해운대", "엘세븐 해운대"] } },
+
+    { "id": "avani_central_busan", "priority": 7, "romanized": true,
+      "forms": {
+        "ko": "아바니 센트럴 부산", "en": "Avani Central Busan",
+        "zh": "釜山阿瓦尼中央酒店", "yue": "釜山阿瓦尼中央酒店", "ja": "アヴァニ・セントラル釜山"
+      },
+      "alias": { "ko": ["아바니센트럴 부산", "아바니 부산"] } },
+
+    { "id": "ramada_encore_busan_station", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "라마다 앙코르 바이 윈덤 부산역", "en": "Ramada Encore by Wyndham Busan Station",
+        "zh": "釜山站华美达安可酒店", "yue": "釜山站華美達安可酒店", "ja": "ラマダアンコール釜山駅"
+      },
+      "alias": { "ko": ["라마다 앙코르 부산역", "라마다 부산역"] } },
+
+    { "id": "asti_hotel_busan_station", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "아스티호텔 부산역", "en": "ASTI Hotel Busan Station",
+        "zh": "釜山站阿斯蒂酒店", "yue": "釜山站阿斯蒂酒店", "ja": "アスティホテル釜山駅"
+      },
+      "alias": { "ko": ["아스티 호텔 부산역", "아스티호텔"] } },
+
+    { "id": "commodore_hotel_busan", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "코모도호텔 부산", "en": "Commodore Hotel Busan",
+        "zh": "釜山科莫多酒店", "yue": "釜山科莫多酒店", "ja": "コモドホテル釜山"
+      },
+      "alias": { "ko": ["코모도 호텔 부산", "코모도호텔"] } },
+
+    { "id": "lavalse_hotel_busan", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "라발스호텔 부산", "en": "Lavalse Hotel Busan",
+        "zh": "釜山拉瓦尔斯酒店", "yue": "釜山拉瓦爾斯酒店", "ja": "ラバルスホテル釜山"
+      },
+      "alias": { "ko": ["라발스 호텔 부산", "라발스호텔"] } },
+
+    { "id": "shilla_stay_haeundae", "priority": 8, "romanized": true,
+      "forms": {
+        "ko": "신라스테이 해운대", "en": "Shilla Stay Haeundae",
+        "zh": "新罗舒泰海云台酒店", "yue": "新羅舒泰海雲台酒店", "ja": "新羅ステイ海雲台"
+      },
+      "alias": { "ko": ["신라 스테이 해운대"] } },
+
+    { "id": "fairfield_songdo", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "페어필드 바이 메리어트 부산 송도비치",
+        "en": "Fairfield by Marriott Busan Songdo Beach",
+        "zh": "釜山松岛海滩万枫酒店", "yue": "釜山松島海灘萬楓酒店",
+        "ja": "フェアフィールド・バイ・マリオット釜山松島ビーチ"
+      },
+      "alias": { "ko": ["페어필드 부산 송도", "페어필드 송도"] } },
+
+    { "id": "crown_harbor_hotel_busan", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "크라운하버호텔 부산", "en": "Crown Harbor Hotel Busan",
+        "zh": "釜山皇冠海港酒店", "yue": "釜山皇冠海港酒店", "ja": "クラウンハーバーホテル釜山"
+      },
+      "alias": { "ko": ["크라운하버 호텔 부산", "크라운 하버 호텔"] } },
+
+    { "id": "busan_business_hotel", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "부산비즈니스호텔", "en": "Busan Business Hotel",
+        "zh": "釜山商务酒店", "yue": "釜山商務酒店", "ja": "釜山ビジネスホテル"
+      },
+      "alias": { "ko": ["부산 비즈니스호텔"] } },
+
+    { "id": "hotel_nongshim", "priority": 6, "romanized": true,
+      "forms": {
+        "ko": "호텔 농심", "en": "Hotel Nongshim",
+        "zh": "农心酒店", "yue": "農心酒店", "ja": "ホテル農心"
+      },
+      "alias": { "ko": ["호텔농심", "농심호텔"] } },
+
+    { "id": "tour_taxi", "priority": 10,
+      "forms": {
+        "ko": "관광택시", "en": "tour taxi", "zh": "观光出租车", "yue": "觀光的士",
+        "ja": "観光タクシー", "vi": "taxi du lịch", "ru": "экскурсионное такси",
+        "th": "แท็กซี่ท่องเที่ยว", "mn": "аяллын такси", "uz": "sayohat taksisi",
+        "ar": "تاكسي سياحي", "es": "taxi turístico", "id": "taksi wisata"
+      },
+      "alias": { "ko": ["관광 택시"] } },
+
+    { "id": "taxi_meter", "priority": 10,
+      "forms": {
+        "ko": "미터기", "en": "taxi meter", "zh": "计价器", "yue": "計價錶",
+        "ja": "メーター", "vi": "đồng hồ tính tiền", "ru": "таксометр",
+        "th": "มิเตอร์", "mn": "таксометр", "uz": "taksometr",
+        "ar": "عداد التاكسي", "es": "taxímetro", "id": "argometer"
+      },
+      "alias": {} },
+
+    { "id": "base_fare", "priority": 10,
+      "forms": {
+        "ko": "기본요금", "en": "base fare", "zh": "起步价", "yue": "起錶價",
+        "ja": "初乗り運賃", "vi": "giá mở cửa", "ru": "стартовый тариф",
+        "th": "ค่าโดยสารเริ่มต้น", "mn": "үндсэн хураамж", "uz": "boshlangʻich haq",
+        "ar": "الأجرة الأساسية", "es": "tarifa base", "id": "tarif dasar"
+      },
+      "alias": { "ko": ["기본 요금"] } },
+
+    { "id": "destination", "priority": 10,
+      "forms": {
+        "ko": "목적지", "en": "destination", "zh": "目的地", "yue": "目的地",
+        "ja": "目的地", "vi": "điểm đến", "ru": "пункт назначения",
+        "th": "จุดหมาย", "mn": "хүрэх газар", "uz": "manzil",
+        "ar": "الوجهة", "es": "destino", "id": "tujuan"
+      },
+      "alias": {} },
+
+    { "id": "stopover", "priority": 10,
+      "forms": {
+        "ko": "경유지", "en": "stopover", "zh": "途经点", "yue": "途經點",
+        "ja": "経由地", "vi": "điểm dừng", "ru": "промежуточная остановка",
+        "th": "จุดแวะพัก", "mn": "дундах зогсоол", "uz": "oraliq manzil",
+        "ar": "نقطة توقف", "es": "parada intermedia", "id": "titik perhentian"
+      },
+      "alias": {} },
+
+    { "id": "travel_time", "priority": 10,
+      "forms": {
+        "ko": "소요시간", "en": "travel time", "zh": "所需时间", "yue": "所需時間",
+        "ja": "所要時間", "vi": "thời gian di chuyển", "ru": "время в пути",
+        "th": "ระยะเวลาเดินทาง", "mn": "зарцуулах хугацаа", "uz": "yoʻl vaqti",
+        "ar": "مدة الرحلة", "es": "tiempo de viaje", "id": "waktu tempuh"
+      },
+      "alias": { "ko": ["소요 시간"] } },
+
+    { "id": "card_payment", "priority": 9,
+      "forms": {
+        "ko": "카드결제", "en": "card payment", "zh": "刷卡支付", "yue": "刷卡付款",
+        "ja": "カード決済", "vi": "thanh toán bằng thẻ", "ru": "оплата картой",
+        "th": "ชำระด้วยบัตร", "mn": "картаар төлөх", "uz": "karta bilan toʻlov",
+        "ar": "الدفع بالبطاقة", "es": "pago con tarjeta", "id": "pembayaran kartu"
+      },
+      "alias": { "ko": ["카드 결제"] } },
+
+    { "id": "cash", "priority": 9,
+      "forms": {
+        "ko": "현금", "en": "cash", "zh": "现金", "yue": "現金",
+        "ja": "現金", "vi": "tiền mặt", "ru": "наличные",
+        "th": "เงินสด", "mn": "бэлэн мөнгө", "uz": "naqd pul",
+        "ar": "نقدًا", "es": "efectivo", "id": "uang tunai"
+      },
+      "alias": {} },
+
+    { "id": "receipt", "priority": 9,
+      "forms": {
+        "ko": "영수증", "en": "receipt", "zh": "收据", "yue": "收據",
+        "ja": "領収書", "vi": "hóa đơn", "ru": "квитанция",
+        "th": "ใบเสร็จ", "mn": "төлбөрийн баримт", "uz": "kvitansiya",
+        "ar": "الفاتورة", "es": "recibo", "id": "struk"
+      },
+      "alias": {} },
+
+    { "id": "toll_fee", "priority": 9,
+      "forms": {
+        "ko": "통행료", "en": "toll fee", "zh": "过路费", "yue": "過路費",
+        "ja": "通行料", "vi": "phí cầu đường", "ru": "плата за проезд",
+        "th": "ค่าผ่านทาง", "mn": "замын хураамж", "uz": "yoʻl toʻlovi",
+        "ar": "رسوم الطريق", "es": "peaje", "id": "biaya tol"
+      },
+      "alias": {} },
+
+    { "id": "late_night_surcharge", "priority": 9,
+      "forms": {
+        "ko": "심야할증", "en": "late-night surcharge", "zh": "深夜加价", "yue": "深夜加價",
+        "ja": "深夜割増", "vi": "phụ phí đêm khuya", "ru": "ночная надбавка",
+        "th": "ค่าบริการเพิ่มช่วงกลางคืน", "mn": "шөнийн нэмэгдэл",
+        "uz": "tungi qoʻshimcha toʻlov", "ar": "رسوم إضافية ليلية",
+        "es": "recargo nocturno", "id": "biaya tambahan malam"
+      },
+      "alias": { "ko": ["심야 할증", "심야할증료"] } },
+
+    { "id": "admission_fee", "priority": 9,
+      "forms": {
+        "ko": "입장료", "en": "admission fee", "zh": "门票费", "yue": "門票費",
+        "ja": "入場料", "vi": "phí vào cổng", "ru": "плата за вход",
+        "th": "ค่าเข้าชม", "mn": "нэвтрэх хураамж", "uz": "kirish toʻlovi",
+        "ar": "رسوم الدخول", "es": "entrada", "id": "tiket masuk"
+      },
+      "alias": {} },
+
+    { "id": "restroom", "priority": 9,
+      "forms": {
+        "ko": "화장실", "en": "restroom", "zh": "洗手间", "yue": "洗手間",
+        "ja": "トイレ", "vi": "nhà vệ sinh", "ru": "туалет",
+        "th": "ห้องน้ำ", "mn": "бие засах газар", "uz": "hojatxona",
+        "ar": "دورة المياه", "es": "baño", "id": "toilet"
+      },
+      "alias": {} },
+
+    { "id": "subway", "priority": 9,
+      "forms": {
+        "ko": "지하철", "en": "subway", "zh": "地铁", "yue": "地鐵",
+        "ja": "地下鉄", "vi": "tàu điện ngầm", "ru": "метро",
+        "th": "รถไฟใต้ดิน", "mn": "метро", "uz": "metro",
+        "ar": "المترو", "es": "metro", "id": "kereta bawah tanah"
+      },
+      "alias": {} },
+
+    { "id": "traffic_jam", "priority": 9,
+      "forms": {
+        "ko": "교통정체", "en": "traffic jam", "zh": "交通堵塞", "yue": "交通擁塞",
+        "ja": "渋滞", "vi": "tắc đường", "ru": "пробка",
+        "th": "รถติด", "mn": "замын бөглөрөл", "uz": "tirbandlik",
+        "ar": "الازدحام المروري", "es": "atasco", "id": "kemacetan"
+      },
+      "alias": { "ko": ["교통 정체"] } },
+
+    { "id": "reservation", "priority": 9,
+      "forms": {
+        "ko": "예약", "en": "reservation", "zh": "预约", "yue": "預約",
+        "ja": "予約", "vi": "đặt trước", "ru": "бронирование",
+        "th": "การจอง", "mn": "захиалга", "uz": "bron",
+        "ar": "الحجز", "es": "reserva", "id": "reservasi"
+      },
+      "alias": {} },
+
+    { "id": "seat_belt", "priority": 8,
+      "forms": {
+        "ko": "안전벨트", "en": "seat belt", "zh": "安全带", "yue": "安全帶",
+        "ja": "シートベルト", "vi": "dây an toàn", "ru": "ремень безопасности",
+        "th": "เข็มขัดนิรภัย", "mn": "хамгаалалтын бүс", "uz": "xavfsizlik kamari",
+        "ar": "حزام الأمان", "es": "cinturón de seguridad", "id": "sabuk keselamatan"
+      },
+      "alias": { "ko": ["안전 벨트", "안전띠"] } },
+
+    { "id": "trunk", "priority": 8,
+      "forms": {
+        "ko": "트렁크", "en": "trunk", "zh": "后备箱", "yue": "車尾箱",
+        "ja": "トランク", "vi": "cốp xe", "ru": "багажник",
+        "th": "ท้ายรถ", "mn": "ачааны хайрцаг", "uz": "bagaj",
+        "ar": "صندوق السيارة", "es": "maletero", "id": "bagasi"
+      },
+      "alias": {} },
+
+    { "id": "transit_card", "priority": 8,
+      "forms": {
+        "ko": "교통카드", "en": "transit card", "zh": "交通卡", "yue": "交通卡",
+        "ja": "交通カード", "vi": "thẻ giao thông", "ru": "транспортная карта",
+        "th": "บัตรโดยสาร", "mn": "тээврийн карт", "uz": "transport kartasi",
+        "ar": "بطاقة المواصلات", "es": "tarjeta de transporte", "id": "kartu transportasi"
+      },
+      "alias": { "ko": ["교통 카드"] } },
+
+    { "id": "currency_exchange", "priority": 8,
+      "forms": {
+        "ko": "환전", "en": "currency exchange", "zh": "货币兑换", "yue": "貨幣兌換",
+        "ja": "両替", "vi": "đổi tiền", "ru": "обмен валюты",
+        "th": "แลกเงิน", "mn": "валют солих", "uz": "valyuta almashtirish",
+        "ar": "صرف العملات", "es": "cambio de divisas", "id": "penukaran uang"
+      },
+      "alias": {} },
+
+    { "id": "duty_free_shop", "priority": 8,
+      "forms": {
+        "ko": "면세점", "en": "duty-free shop", "zh": "免税店", "yue": "免稅店",
+        "ja": "免税店", "vi": "cửa hàng miễn thuế", "ru": "магазин duty-free",
+        "th": "ร้านค้าปลอดภาษี", "mn": "татваргүй дэлгүүр", "uz": "boj toʻlanmagan doʻkon",
+        "ar": "السوق الحرة", "es": "tienda libre de impuestos", "id": "toko bebas pajak"
+      },
+      "alias": {} },
+
+    { "id": "tourist_info_center", "priority": 8,
+      "forms": {
+        "ko": "관광안내소", "en": "tourist information center", "zh": "旅游服务中心",
+        "yue": "旅遊服務中心", "ja": "観光案内所", "vi": "trung tâm thông tin du lịch",
+        "ru": "туристический информационный центр", "th": "ศูนย์บริการนักท่องเที่ยว",
+        "mn": "аялал жуулчлалын мэдээллийн төв", "uz": "turistik maʼlumot markazi",
+        "ar": "مركز المعلومات السياحية", "es": "oficina de turismo",
+        "id": "pusat informasi wisata"
+      },
+      "alias": { "ko": ["관광 안내소"] } },
+
+    { "id": "cable_car", "priority": 8,
+      "forms": {
+        "ko": "케이블카", "en": "cable car", "zh": "缆车", "yue": "纜車",
+        "ja": "ケーブルカー", "vi": "cáp treo", "ru": "фуникулёр",
+        "th": "กระเช้าลอยฟ้า", "mn": "кабель машин", "uz": "arqonli yoʻl",
+        "ar": "التلفريك", "es": "teleférico", "id": "kereta gantung"
+      },
+      "alias": { "ko": ["케이블 카"] } },
+
+    { "id": "sightseeing_cruise", "priority": 7,
+      "forms": {
+        "ko": "유람선", "en": "sightseeing cruise", "zh": "观光游船", "yue": "觀光遊船",
+        "ja": "遊覧船", "vi": "tàu du ngoạn", "ru": "прогулочный катер",
+        "th": "เรือชมวิว", "mn": "зугаалгын онгоц", "uz": "sayohat kemasi",
+        "ar": "قارب سياحي", "es": "barco turístico", "id": "kapal wisata"
+      },
+      "alias": {} },
+
+    { "id": "night_view", "priority": 7,
+      "forms": {
+        "ko": "야경", "en": "night view", "zh": "夜景", "yue": "夜景",
+        "ja": "夜景", "vi": "cảnh đêm", "ru": "ночной вид",
+        "th": "วิวกลางคืน", "mn": "шөнийн үзэмж", "uz": "tungi manzara",
+        "ar": "المنظر الليلي", "es": "vista nocturna", "id": "pemandangan malam"
+      },
+      "alias": {} },
+
+    { "id": "dwaeji_gukbap", "priority": 7,
+      "forms": {
+        "ko": "돼지국밥", "en": "dwaeji-gukbap (pork and rice soup)",
+        "zh": "猪肉汤饭", "yue": "豬肉湯飯", "ja": "テジクッパ（豚肉のスープごはん）",
+        "vi": "cơm canh thịt heo Busan", "ru": "тведжи-кукпап (суп со свининой и рисом)",
+        "th": "ข้าวซุปหมู (แทจีกุกบับ)", "mn": "гахайн шөлтэй будаа",
+        "uz": "choʻchqa goʻshtli shoʻrva-guruch", "ar": "حساء لحم الخنزير مع الأرز",
+        "es": "sopa de cerdo con arroz (dwaeji-gukbap)", "id": "sup babi dengan nasi"
+      },
+      "alias": { "ko": ["돼지 국밥"] } },
+
+    { "id": "milmyeon", "priority": 7,
+      "forms": {
+        "ko": "밀면", "en": "milmyeon (Busan cold wheat noodles)",
+        "zh": "小麦冷面", "yue": "小麥冷麵", "ja": "ミルミョン（小麦冷麺）",
+        "vi": "mì lạnh Busan", "ru": "мильмён (холодная пшеничная лапша)",
+        "th": "มิลมยอน (บะหมี่เย็น)", "mn": "мильмён (хүйтэн гоймон)",
+        "uz": "milmyeon (sovuq bugʻdoy ugrasi)", "ar": "ميلميون (نودلز باردة)",
+        "es": "milmyeon (fideos fríos de trigo)", "id": "milmyeon (mi gandum dingin)"
+      },
+      "alias": {} },
+
+    { "id": "ssiat_hotteok", "priority": 7,
+      "forms": {
+        "ko": "씨앗호떡", "en": "ssiat-hotteok (seed-filled pancake)",
+        "zh": "坚果糖饼", "yue": "堅果糖餅", "ja": "種入りホットク",
+        "vi": "bánh hotteok nhân hạt", "ru": "хотток с семечками",
+        "th": "ฮอตต็อกไส้ธัญพืช", "mn": "үртэй хотток",
+        "uz": "urugʻli hotteok", "ar": "هوتوك بالمكسرات",
+        "es": "hotteok de semillas", "id": "hotteok isi biji"
+      },
+      "alias": { "ko": ["씨앗 호떡"] } },
+
+    { "id": "eomuk", "priority": 7,
+      "forms": {
+        "ko": "어묵", "en": "eomuk (fish cake)", "zh": "鱼饼", "yue": "魚餅",
+        "ja": "おでん（魚のすり身）", "vi": "chả cá", "ru": "рыбные лепёшки",
+        "th": "ลูกชิ้นปลา", "mn": "загасны бялуу", "uz": "baliq kotleti",
+        "ar": "كيك السمك", "es": "pastel de pescado", "id": "kue ikan"
+      },
+      "alias": {} }
   ]
 }

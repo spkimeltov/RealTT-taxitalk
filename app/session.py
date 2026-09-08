@@ -11,7 +11,7 @@
 
 interpreter 와 다른 점이 둘 있다.
 
-* 턴 슬롯이 채널별로 있다. 마이크 2개 모드에서는 대화원과 고객이 동시에 말할 수
+* 턴 슬롯이 채널별로 있다. 마이크 2개 모드에서는 기사와 탑승객이 동시에 말할 수
   있고, 그때 한쪽을 버리면 대화가 끊긴다.
 * 마이크 1개 모드에서는 화자를 언어로 가른다. 판별이 끝나야 어느 쪽 말인지 알 수
   있으므로, 발화 도중 처음 판별에 성공한 시점에 `turn_speaker` 를 따로 내려보내
@@ -33,6 +33,7 @@ from starlette.websockets import WebSocketDisconnect
 
 from .config import (
     BYTES_PER_SEC,
+    MIC_SINGLE,
     SIDE_BY_CODE,
     SIDE_PATIENT,
     SIDE_SHARED,
@@ -40,6 +41,7 @@ from .config import (
     STAFF_LANG,
     Settings,
 )
+from .dialect import Dialect
 from .glossary import Glossary
 from .storage import SessionStore, turn_entry
 from .stt import SttEngine
@@ -82,6 +84,7 @@ class ConsultSession:
         stt: SttEngine,
         translator: Translator,
         glossary: Glossary,
+        dialect: Dialect,
         store: SessionStore,
         settings: Settings,
         meta: dict,
@@ -90,6 +93,7 @@ class ConsultSession:
         self._stt = stt
         self._translator = translator
         self._glossary = glossary
+        self._dialect = dialect
         self._store = store
         self._s = settings
 
@@ -105,8 +109,6 @@ class ConsultSession:
         self._recorded = 0
         # 방향별로 직전 대화를 따로 기억한다. 섞으면 모델이 출력 언어를 헷갈린다.
         self._history: dict[str, list[tuple[str, str]]] = {}
-        # 판별이 애매할 때 참고할 직전 화자.
-        self._last_speaker: Optional[str] = None
         self._max_bytes = int(self._s.max_utterance_sec * BYTES_PER_SEC)
 
     # ------------------------------------------------------------------ 루프
@@ -169,7 +171,6 @@ class ConsultSession:
             await self._cancel_turn(self._side_of(data))
         elif kind == "reset":
             self._history.clear()
-            self._last_speaker = None
             await self._send({"type": "reset"})
         elif kind == "ping":
             await self._send({"type": "pong", "t": data.get("t")})
@@ -271,6 +272,20 @@ class ConsultSession:
             turn.partial_task.cancel()
         turn.partial_task = None
 
+    # ------------------------------------------------------------ STT 프롬프트
+    def _stt_prompt(self, lang: str) -> str:
+        """whisper 에 미리 들려줄 한 줄. 용어집 뒤에 사투리 예시를 붙인다.
+
+        사투리는 기사(한국어) 쪽에만 붙인다. 탑승객 언어 전사에 넣으면 엉뚱한
+        한국어 토큰이 섞일 뿐이다.
+        """
+        prompt = self._glossary.initial_prompt(lang, self._s.glossary_prompt_terms)
+        if lang == STAFF_LANG:
+            hint = self._dialect.prompt(self._s.dialect_prompt_words)
+            if hint:
+                prompt = f"{prompt} {hint}" if prompt else hint
+        return prompt
+
     # -------------------------------------------------------------- 중간 자막
     async def _maybe_partial(self, turn: Turn) -> None:
         interval = self._s.partial_interval_sec
@@ -296,9 +311,7 @@ class ConsultSession:
                 pcm,
                 turn.src,
                 final=False,
-                initial_prompt=self._glossary.initial_prompt(
-                    turn.src or STAFF_LANG, self._s.glossary_prompt_terms
-                ),
+                initial_prompt=self._stt_prompt(turn.src or STAFF_LANG),
             )
         except asyncio.CancelledError:
             raise
@@ -324,7 +337,13 @@ class ConsultSession:
 
     # -------------------------------------------------------------- 언어 판별
     async def _resolve_language(self, turn: Turn, pcm: bytes, *, announce: bool) -> bool:
-        """마이크 1개 모드에서 이 발화의 화자를 정한다."""
+        """중간 자막을 어느 쪽에 어느 언어로 띄울지 임시로 정한다.
+
+        여기서 내리는 결정은 잠정적이다. 발화가 끝나면 `_run_pipeline` 이 후보 언어로
+        각각 전사해 보고 점수로 화자를 확정하며, 그 결과가 이 추정을 덮는다. 판별이
+        애매해도 확률 1위를 그대로 쓴다. 예전에는 직전 화자의 반대편으로 넘겼지만,
+        그렇게 뒤집힌 발화에 엉뚱한 언어가 강제되면 whisper 가 상용구를 지어냈다.
+        """
         if turn.resolved:
             return True
 
@@ -333,24 +352,21 @@ class ConsultSession:
             return False
 
         language = str(detection["language"])
-        if detection["margin"] < self._s.lid_margin and self._last_speaker is not None:
-            # 두 언어의 확률이 비슷하면 판별을 믿지 않는다. 대화는 번갈아 가며
-            # 이어지므로 직전 화자의 반대편으로 보는 편이 낫다.
-            speaker = SIDE_PATIENT if self._last_speaker == SIDE_STAFF else SIDE_STAFF
-            detection["fallback"] = "alternate"
-        else:
-            speaker = SIDE_STAFF if language == STAFF_LANG else SIDE_PATIENT
+        detection["provisional"] = True
+        if detection["margin"] < self._s.lid_margin:
+            # 확정 단계에서 뒤집힐 가능성이 높다는 표시. 판단 자체는 바꾸지 않는다.
+            detection["low_margin"] = True
 
-        self._assign(turn, speaker)
+        self._assign(turn, SIDE_STAFF if language == STAFF_LANG else SIDE_PATIENT)
         turn.lid = detection
         log.info(
-            "턴 %s 화자 판별: %s (%s, p=%s, margin=%s%s)",
+            "턴 %s 화자 추정: %s (%s, p=%s, margin=%s%s)",
             turn.id,
-            speaker,
+            turn.speaker,
             language,
             detection.get("probability"),
             detection.get("margin"),
-            ", 교대추정" if detection.get("fallback") else "",
+            ", 판별 애매" if detection.get("low_margin") else "",
         )
         if announce:
             await self._send_safe(
@@ -371,22 +387,38 @@ class ConsultSession:
         pcm = bytes(turn.pcm)
         metrics: dict = {"audio_sec": round(len(pcm) / BYTES_PER_SEC, 2)}
         try:
-            if not turn.resolved:
-                # 발화가 짧아 중간 판별을 못 했으면 여기서 전체 오디오로 판별한다.
-                if not await self._resolve_language(turn, pcm, announce=False):
-                    self._assign(turn, self._fallback_speaker())
-
-            src = turn.src or STAFF_LANG
-            dst = turn.dst or self._patient_lang
-
-            stt_result = await self._stt.transcribe(
-                pcm,
-                src,
-                final=True,
-                initial_prompt=self._glossary.initial_prompt(
-                    src, self._s.glossary_prompt_terms
-                ),
-            )
+            if self._mic_mode == MIC_SINGLE:
+                # 채널이 화자를 알려주지 않는 모드다. 언어 판별만 믿고 한쪽 언어를
+                # 강제하면, 틀렸을 때 whisper 가 상용구를 지어내 그것이 그대로 번역돼
+                # 올라간다. 후보 언어로 각각 전사해 보고 점수가 높은 쪽을 택한다.
+                stt_result = await self._stt.transcribe_best(
+                    pcm,
+                    self._candidates,
+                    prompts={lang: self._stt_prompt(lang) for lang in self._candidates},
+                )
+                chosen = str(stt_result.get("language") or STAFF_LANG)
+                self._assign(turn, SIDE_STAFF if chosen == STAFF_LANG else SIDE_PATIENT)
+                metrics["stt_scores"] = stt_result.get("scores")
+                metrics["stt_score_margin"] = stt_result.get("score_margin")
+                src, dst = turn.src or STAFF_LANG, turn.dst or self._patient_lang
+                log.info(
+                    "턴 %s 화자 확정: %s (%s, 점수 %s, 차 %s)",
+                    turn.id,
+                    turn.speaker,
+                    chosen,
+                    stt_result.get("scores"),
+                    stt_result.get("score_margin"),
+                )
+            else:
+                # 마이크 2개 모드는 채널이 곧 화자라 전사할 언어가 이미 정해져 있다.
+                src = turn.src or STAFF_LANG
+                dst = turn.dst or self._patient_lang
+                stt_result = await self._stt.transcribe(
+                    pcm,
+                    src,
+                    final=True,
+                    initial_prompt=self._stt_prompt(src),
+                )
             metrics["stt_ms"] = stt_result.get("ms")
             source_text = self._glossary.canonicalize(
                 (stt_result.get("text") or "").strip(), src
@@ -396,7 +428,6 @@ class ConsultSession:
                 await self._send_safe({"type": "empty", "turn": turn.id})
                 return
 
-            self._last_speaker = turn.speaker
             await self._send(
                 {
                     "type": "transcript",
@@ -412,8 +443,18 @@ class ConsultSession:
             terms = self._glossary.match(source_text, src, dst)
             if terms:
                 metrics["terms"] = [f"{a}->{b}" for a, b in terms]
+
+            # 사투리 뜻풀이는 한국어 발화에만 붙인다. 탑승객 언어에는 해당이 없다.
+            notes = (
+                self._dialect.notes(source_text, self._s.dialect_max_notes)
+                if src == STAFF_LANG
+                else []
+            )
+            if notes:
+                metrics["dialect"] = len(notes)
+
             translation = await self._stream_translation(
-                turn, source_text, src, dst, terms, metrics, t_end
+                turn, source_text, src, dst, terms, notes, metrics, t_end
             )
 
             await self._send(
@@ -437,12 +478,6 @@ class ConsultSession:
                 {"type": "error", "turn": turn.id, "message": f"{type(exc).__name__}: {exc}"}
             )
 
-    def _fallback_speaker(self) -> str:
-        """판별할 오디오조차 부족할 때. 대화는 번갈아 간다고 본다."""
-        if self._last_speaker == SIDE_STAFF:
-            return SIDE_PATIENT
-        return SIDE_STAFF
-
     async def _stream_translation(
         self,
         turn: Turn,
@@ -450,13 +485,20 @@ class ConsultSession:
         src: str,
         dst: str,
         terms: list[tuple[str, str]],
+        dialect_notes: list[str],
         metrics: dict,
         t_end: float,
     ) -> str:
         parts: list[str] = []
         first = True
         async for delta in self._translator.stream(
-            source_text, src, dst, self._history_for(src, dst), terms
+            source_text,
+            src,
+            dst,
+            self._history_for(src, dst),
+            terms,
+            dialect_enabled=bool(self._dialect),
+            dialect_notes=dialect_notes,
         ):
             if first:
                 first = False
@@ -489,7 +531,7 @@ class ConsultSession:
         try:
             await self._store.append_turn(self._session_id, entry)
         except Exception:  # noqa: BLE001
-            # 기록이 실패해도 대화은 계속돼야 한다.
+            # 기록이 실패해도 대화는 계속돼야 한다.
             log.exception("대화기록 저장 실패: %s", self._session_id)
 
     # ------------------------------------------------------------------ 이력

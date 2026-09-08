@@ -1,6 +1,6 @@
 """대화기록 저장.
 
-한 대화이 디렉터리 하나다. 발화가 확정될 때마다 `transcript.jsonl` 에 한 줄씩
+한 대화가 디렉터리 하나다. 발화가 확정될 때마다 `transcript.jsonl` 에 한 줄씩
 덧붙이므로, 대화 도중 브라우저가 죽거나 컨테이너가 재시작돼도 그때까지의 대화는
 남는다. 요약이나 검색 없이 append 만 하면 되는 단계라 DB 를 두지 않았다.
 
@@ -168,7 +168,7 @@ class SessionStore:
         if transcript.is_file():
             count = sum(1 for line in transcript.read_text(encoding="utf-8").splitlines() if line.strip())
         meta["turns"] = count
-        # 이미 닫힌 대화을 다시 닫아도 처음 종료 시각을 유지한다.
+        # 이미 닫힌 대화를 다시 닫아도 처음 종료 시각을 유지한다.
         if not meta.get("ended_at"):
             meta["ended_at"] = _iso(now_kst())
         meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")

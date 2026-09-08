@@ -21,6 +21,7 @@ from .config import (
     lang_entry,
     ui_text,
 )
+from .dialect import Dialect
 from .export import FORMATS, render
 from .glossary import Glossary
 from .session import ConsultSession
@@ -56,16 +57,18 @@ async def lifespan(app: FastAPI):
     app.state.stt = SttEngine(SETTINGS)
     app.state.translator = Translator(SETTINGS)
     app.state.glossary = Glossary.load(SETTINGS.glossary_path or None)
+    app.state.dialect = Dialect.load(SETTINGS.ko_dialect, SETTINGS.dialect_path or None)
     app.state.store = SessionStore(SETTINGS.session_dir)
     app.state.store.ensure_root()
     app.state.load_error = None
     app.state.loader = asyncio.create_task(_load_models(app))
     log.info(
-        "기동: stt=%s mt=%s@%s 용어 %s개 기록=%s",
+        "기동: stt=%s mt=%s@%s 용어 %s개 방언=%s 기록=%s",
         SETTINGS.whisper_model,
         SETTINGS.vllm_model,
         SETTINGS.vllm_base_url,
         len(app.state.glossary),
+        app.state.dialect.label or "off",
         SETTINGS.session_dir,
     )
     try:
@@ -109,6 +112,12 @@ async def health() -> dict:
         },
         "mt": {"model": SETTINGS.vllm_model, "base_url": SETTINGS.vllm_base_url},
         "glossary": {"terms": len(app.state.glossary), "source": app.state.glossary.source},
+        "dialect": {
+            "name": app.state.dialect.name or "off",
+            "label": app.state.dialect.label,
+            "rules": len(app.state.dialect),
+            "source": app.state.dialect.source,
+        },
         "sessions": {"dir": SETTINGS.session_dir},
     }
 
@@ -118,10 +127,10 @@ async def config() -> dict:
     return {
         "staff_lang": STAFF_LANG,
         # 서버가 다룰 수 있는 언어 전부. 이 중 `featured` 만 시작 화면에 카드로
-        # 뜨고, 고객이 고를 수 있는 것도 그 카드뿐이다.
+        # 뜨고, 탑승객이 고를 수 있는 것도 그 카드뿐이다.
         "languages": [lang_entry(code) for code in SETTINGS.enabled_languages],
         "featured": list(SETTINGS.patient_languages),
-        # 고객 화면 문구는 번역이 준비된 언어만 내려보낸다. 없는 언어는 화면이
+        # 탑승객 화면 문구는 번역이 준비된 언어만 내려보낸다. 없는 언어는 화면이
         # `fallback_ui`(영어)로 대체한다. 카탈로그를 다 실어 보내면 대부분이 같은
         # 영어 문구의 사본이라 낭비다.
         "ui": {code: text for code, text in UI_TEXT.items() if code != STAFF_LANG},
@@ -252,6 +261,7 @@ async def session_ws(ws: WebSocket) -> None:
         stt=stt,
         translator=ws.app.state.translator,
         glossary=ws.app.state.glossary,
+        dialect=ws.app.state.dialect,
         store=ws.app.state.store,
         settings=ws.app.state.settings,
         meta=meta,
