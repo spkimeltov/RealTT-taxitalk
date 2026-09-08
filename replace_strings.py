@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""MEDI-TALK를 TAXI-TALK로, 의료전문을 관광투어로 변경하는 스크립트"""
+"""taxi-TALK를 TAXI-TALK로, 관광투어을 관광투어로 변경하는 스크립트"""
 
 import re
 from pathlib import Path
 
 # 변경할 매핑
 REPLACEMENTS = {
-    "MEDI-TALK": "MEDI-TALK",
-    "의료전문": "의료전문",
+    "TAXI-TALK": "TAXI-TALK",
+    "관광투어": "관광투어",
 }
 
 # 대상 파일 확장자

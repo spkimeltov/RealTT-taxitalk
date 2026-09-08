@@ -1,0 +1,26 @@
+# 앞의 / 는 저장소 루트를 뜻한다. 그냥 `data/` 로 두면 용어집이 든
+# app/data/ 까지 함께 빠진다.
+/.env
+/.env.*
+!/.env.example
+/models/
+/data/
+
+# 파이썬
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 편집기·OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 오피스 임시 파일, 배포 중 만들어지는 묶음
+~$*
+*.log
+*.zip
+*.tar.gz

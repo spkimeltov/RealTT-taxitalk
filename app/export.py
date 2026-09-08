@@ -1,4 +1,4 @@
-"""상담기록 내보내기 — TXT · JSON · 인쇄용 HTML.
+"""대화기록 내보내기 — TXT · JSON · 인쇄용 HTML.
 
 PDF 는 만들지 않는다. CJK 폰트를 컨테이너에 넣어야 하고 레이아웃도 따로 잡아야
 하는데, 인쇄용 HTML 을 브라우저에서 `PDF 로 저장` 하면 같은 결과를 얻는다.
@@ -48,7 +48,7 @@ def _duration(meta: dict) -> str:
 
 def _speaker_label(speaker: str, patient_lang: str) -> str:
     if speaker == "staff":
-        return "상담원"
+        return "대화원"
     return f"고객 ({lang_label(patient_lang)})"
 
 
@@ -69,7 +69,7 @@ def _korean_and_foreign(turn: dict) -> tuple[str, str]:
 def to_text(meta: dict, turns: Iterable[dict]) -> str:
     patient_lang = str(meta.get("patient_lang") or "en")
     lines = [
-        "TAXI-TALK 상담 기록",
+        "TAXI-TALK 대화 기록",
         "=" * 60,
         f"세션 : {meta.get('id')}",
         f"언어 : {_pair_label(patient_lang)}",
@@ -169,18 +169,18 @@ def to_html(meta: dict, turns: Iterable[dict]) -> str:
         )
 
     body = "\n".join(rows) or '      <p class="empty">기록된 발화가 없습니다.</p>'
-    clinic = html.escape(str(meta.get("clinic") or "성형외과·피부과 외국인 고객 상담"))
+    clinic = html.escape(str(meta.get("clinic") or "성형외과·피부과 외국인 고객 대화"))
 
     return f"""<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title>TAXI-TALK 상담 기록 {html.escape(str(meta.get('id') or ''))}</title>
+<title>TAXI-TALK 대화 기록 {html.escape(str(meta.get('id') or ''))}</title>
 <style>{_HTML_STYLE}</style>
 </head>
 <body>
   <div class="sheet">
-    <h1>TAXI-TALK 상담 기록</h1>
+    <h1>TAXI-TALK 대화 기록</h1>
     <p class="sub">{clinic}</p>
     <dl class="meta">
       <dt>세션</dt><dd>{html.escape(str(meta.get('id') or ''))}</dd>

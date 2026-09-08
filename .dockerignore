@@ -1,0 +1,13 @@
+# 앞의 / 는 빌드 컨텍스트 루트를 뜻한다. 그냥 `data/` 로 두면 용어집이 든
+# app/data/ 까지 함께 빠질 수 있다.
+/.env
+/models/
+/data/
+/deploy/
+/README.md
+# 로컬 개발용 가상환경과 저장소 내부는 이미지에 들어갈 이유가 없다.
+/.venv/
+/.git/
+/.idea/
+**/__pycache__/
+*.pyc

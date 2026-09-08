@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#eef2f8">
+<title>AI TAXI-TALK — 관광투어 AI 통역시스템</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-layout="single" data-view="setup" data-state="idle">
+
+<!--
+  같은 대화를 두 벌 그려 두고 배치만 바꾼다.
+
+  single  1920 한 화면에 대화원과 고객이 함께 본다. 아래 `staff` 화면만 쓰고,
+          발화마다 상대가 읽을 언어를 크게 띄운다.
+  dual    3840x1080 창을 좌우로 반씩 나눠 모니터 두 대에 걸친다. 왼쪽은
+          대화원(한국어), 오른쪽은 고객(선택 언어)이 각자 자기 언어를 크게 본다.
+-->
+<div class="stage">
+
+  <!-- ================================= 대화원 화면 (합친 화면에서는 이것만) -->
+  <section class="screen" data-screen="staff">
+    <header class="bar">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3.4c-4.7 0-8.5 3.1-8.5 7 0 2.2 1.2 4.2 3.2 5.5v3.3l3.2-1.6c.7.1 1.4.2 2.1.2 4.7 0 8.5-3.1 8.5-7s-3.8-7.4-8.5-7.4Z" fill="currentColor"/>
+            <path d="M10.9 6.6h2.2v2.9H16v2.2h-2.9v2.9h-2.2v-2.9H8V9.5h2.9z" fill="#fff"/>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <span class="name"><b>AI</b> TAXI-TALK</span>
+          <span class="tagline">관광투어 AI 통역시스템</span>
+        </span>
+      </div>
+      <div class="pair" data-pair>한국어</div>
+      <div class="spacer"></div>
+      <button class="icon" type="button" data-action="settings" title="마이크 설정">
+        <svg class="gear" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.1"/>
+          <path d="M19.4 13.5a8 8 0 0 0 0-3l1.8-1.4-1.8-3.1-2.1.9a7.6 7.6 0 0 0-2.6-1.5L14.4 3h-3.6l-.3 2.4c-1 .3-1.8.8-2.6 1.5l-2.1-.9-1.8 3.1 1.8 1.4a8 8 0 0 0 0 3L4 14.9l1.8 3.1 2.1-.9c.8.7 1.6 1.2 2.6 1.5l.3 2.4h3.6l.3-2.4c1-.3 1.8-.8 2.6-1.5l2.1.9 1.8-3.1z"/>
+        </svg>
+        설정
+      </button>
+      <div class="conn">
+        <span class="dot" data-dot></span>
+        <span data-conn>준비</span>
+      </div>
+    </header>
+
+    <main class="body">
+      <!-- 시작 화면 -->
+      <div class="panel setup" data-panel="setup">
+        <div class="hero">
+          <span class="hero-mark" aria-hidden="true">
+            <svg viewBox="0 0 128 40">
+              <g class="wave">
+                <rect x="2" y="16" width="3" height="8" rx="1.5"/>
+                <rect x="10" y="11" width="3" height="18" rx="1.5"/>
+                <rect x="18" y="6" width="3" height="28" rx="1.5"/>
+                <rect x="26" y="13" width="3" height="14" rx="1.5"/>
+                <rect x="34" y="17" width="3" height="6" rx="1.5"/>
+                <rect x="91" y="6" width="3" height="28" rx="1.5"/>
+                <rect x="99" y="13" width="3" height="14" rx="1.5"/>
+                <rect x="107" y="11" width="3" height="18" rx="1.5"/>
+                <rect x="115" y="16" width="3" height="8" rx="1.5"/>
+                <rect x="123" y="18" width="3" height="4" rx="1.5"/>
+              </g>
+              <circle cx="76" cy="24" r="9" class="bubble-2"/>
+              <circle cx="59" cy="19" r="15" class="bubble-1"/>
+              <path d="M57.4 11.6h3.2v4.2h4.2v3.2h-4.2v4.2h-3.2v-4.2h-4.2v-3.2h4.2z" fill="#fff"/>
+            </svg>
+          </span>
+          <p class="hero-eyebrow">관광투어 AI 통역시스템</p>
+          <p class="hero-title"><b>AI</b> <span>TAXI-TALK</span></p>
+          <h1>사용 언어를 선택해 주세요</h1>
+          <p class="lead">원하시는 언어를 선택하면 한국어와 해당 언어로 실시간 통역이 시작됩니다.</p>
+        </div>
+        <div class="lang-grid" data-langs></div>
+        <p class="note" data-mic-note></p>
+      </div>
+
+      <!-- 대화 화면 -->
+      <div class="panel log" data-panel="consult" data-log></div>
+
+      <!-- 종료 화면 -->
+      <div class="panel ended" data-panel="ended">
+        <h1>대화이 종료되었습니다</h1>
+        <p class="lead merged-only" data-ended-title></p>
+        <p class="lead merged-only" data-ended-note></p>
+        <!-- <dl class="summary" data-summary></dl>
+        <div class="downloads">
+          <a class="btn primary" data-download="txt" download>대화록 TXT</a>
+          <a class="btn" data-download="html" download>인쇄용 HTML</a>
+          <a class="btn" data-download="json" download>원본 JSON</a>
+        </div> -->
+        <button class="btn ghost wide" type="button" data-action="new">새 대화 시작</button>
+      </div>
+    </main>
+
+    <!-- 언어를 고르는 동안만 띄우는 안내. 대화이 시작되면 접힌다. -->
+    <div class="notice">
+      <span class="item">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2.6 4.6 5.4v6.1c0 4.6 3.1 8.4 7.4 9.9 4.3-1.5 7.4-5.3 7.4-9.9V5.4z" fill="currentColor"/>
+          <path d="M10.9 7.4h2.2v2.7H16v2.2h-2.9v2.7h-2.2v-2.7H8v-2.2h2.9z" fill="#fff"/>
+        </svg>
+        모든 통역은 의료 환경에 최적화된 AI 기술로 안전하고 정확하게 제공합니다.
+      </span>
+      <span class="sep"></span>
+      <span class="item">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7.6 10.4V8a4.4 4.4 0 0 1 8.8 0v2.4" fill="none" stroke="currentColor" stroke-width="2.1"/>
+          <rect x="4.8" y="10.2" width="14.4" height="10.4" rx="2.6" fill="currentColor"/>
+        </svg>
+        개인정보 보호와 보안을 최우선으로 합니다.
+      </span>
+    </div>
+
+    <footer class="bar foot">
+      <div class="mic">
+        <span class="mic-dot" data-mic-dot></span>
+        <span data-mic-text>대기</span>
+      </div>
+      <div class="level"><span data-level-bar></span></div>
+      <div class="spacer"></div>
+      <div class="ctrls">
+        <button class="btn" type="button" data-action="pause" disabled>일시정지</button>
+        <!-- <button class="btn" type="button" data-action="records" disabled>기록</button> -->
+        <button class="btn" type="button" data-action="change" disabled>언어변경</button>
+        <button class="btn danger" type="button" data-action="end" disabled>대화종료</button>
+        <button class="btn" type="button" data-action="home">홈으로</button>
+      </div>
+    </footer>
+
+    <!-- 확인창과 설정창은 이 화면 안에만 띄운다. 창이 두 모니터에 걸쳐 있어서
+         화면 전체를 덮는 모달을 쓰면 베젤 위에 걸린다. -->
+    <div class="sheet" data-sheet hidden>
+      <div class="sheet-card" data-sheet-card></div>
+    </div>
+  </section>
+
+  <!-- ============================= 고객 화면 (모니터 2 · dual 배치에서만 표시) -->
+  <section class="screen" data-screen="patient">
+    <header class="bar">
+      <div class="pair" data-pair>AI TAXI-TALK</div>
+      <div class="spacer"></div>
+      <div class="conn">
+        <span class="dot" data-dot></span>
+        <span data-conn></span>
+      </div>
+    </header>
+
+    <main class="body">
+      <div class="panel setup" data-panel="setup">
+        <div class="hints" data-hints></div>
+      </div>
+
+      <div class="panel log" data-panel="consult" data-log></div>
+
+      <div class="panel ended" data-panel="ended">
+        <h1 data-ended-title></h1>
+        <p class="lead" data-ended-note></p>
+      </div>
+    </main>
+
+    <footer class="bar foot">
+      <div class="mic">
+        <span class="mic-dot" data-mic-dot></span>
+        <span data-mic-text></span>
+      </div>
+    </footer>
+  </section>
+
+</div>
+
+<div class="toasts" data-toasts></div>
+
+<script src="app.js" type="module"></script>
+</body>
+</html>

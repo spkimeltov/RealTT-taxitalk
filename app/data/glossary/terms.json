@@ -1,0 +1,317 @@
+{
+  "version": 2,
+  "note": "성형외과·피부과 대화 전문용어. forms 는 13개 언어(ko/en/zh/yue/ja/vi/ru/th/mn/uz/ar/es/id)를 채웠고, 여기에 없는 언어는 번역 모델의 일반 지식에 맡긴다. alias 는 STT 가 실제로 자주 잘못 받아쓰는 표기만 넣고 canonical 형태로 되돌린다. 무르게 잡으면 멀쩡한 말이 바뀐다.",
+  "terms": [
+    {
+      "id": "botox",
+      "priority": 10,
+      "forms": {
+        "ko": "보톡스", "en": "Botox", "zh": "肉毒素", "yue": "肉毒素", "ja": "ボトックス",
+        "vi": "Botox", "ru": "ботокс", "th": "โบท็อกซ์", "mn": "ботокс",
+        "uz": "Botoks", "ar": "البوتوكس", "es": "bótox", "id": "Botox"
+      },
+      "alias": { "ko": ["보독스", "보톡"], "en": ["botulinum toxin"] }
+    },
+    {
+      "id": "filler",
+      "priority": 10,
+      "forms": {
+        "ko": "필러", "en": "filler", "zh": "填充剂", "yue": "填充劑", "ja": "フィラー",
+        "vi": "filler", "ru": "филлер", "th": "ฟิลเลอร์", "mn": "филлер",
+        "uz": "filler", "ar": "الفيلر", "es": "relleno dérmico", "id": "filler"
+      },
+      "alias": { "ko": ["피러"] }
+    },
+    {
+      "id": "ultherapy",
+      "priority": 10,
+      "forms": {
+        "ko": "울쎄라", "en": "Ultherapy", "zh": "超声刀", "yue": "超聲刀", "ja": "ウルセラ",
+        "vi": "Ultherapy", "ru": "Ultherapy", "th": "Ultherapy", "mn": "Ultherapy",
+        "uz": "Ultherapy", "ar": "ألثيرابي", "es": "Ultherapy", "id": "Ultherapy"
+      },
+      "alias": { "ko": ["울세라", "울쓰라", "울쎄라리프팅"] }
+    },
+    {
+      "id": "thermage",
+      "priority": 10,
+      "forms": {
+        "ko": "써마지", "en": "Thermage", "zh": "热玛吉", "yue": "熱瑪吉", "ja": "サーマクール",
+        "vi": "Thermage", "ru": "Thermage", "th": "Thermage", "mn": "Thermage",
+        "uz": "Thermage", "ar": "ثيرماج", "es": "Thermage", "id": "Thermage"
+      },
+      "alias": { "ko": ["서마지", "쎄마지"] }
+    },
+    {
+      "id": "inmode",
+      "priority": 9,
+      "forms": {
+        "ko": "인모드", "en": "InMode", "zh": "InMode", "yue": "InMode", "ja": "インモード",
+        "vi": "InMode", "ru": "InMode", "th": "InMode", "mn": "InMode",
+        "uz": "InMode", "ar": "إنمود", "es": "InMode", "id": "InMode"
+      },
+      "alias": { "ko": ["인모두"] }
+    },
+    {
+      "id": "lifting",
+      "priority": 8,
+      "forms": {
+        "ko": "리프팅", "en": "lifting", "zh": "提升", "yue": "提升", "ja": "リフティング",
+        "vi": "nâng cơ", "ru": "лифтинг", "th": "ยกกระชับ", "mn": "арьс чангалах",
+        "uz": "lifting", "ar": "شد البشرة", "es": "lifting", "id": "pengencangan kulit"
+      },
+      "alias": {}
+    },
+    {
+      "id": "pigmentation",
+      "priority": 8,
+      "forms": {
+        "ko": "색소침착", "en": "pigmentation", "zh": "色素沉着", "yue": "色素沉著", "ja": "色素沈着",
+        "vi": "tăng sắc tố", "ru": "пигментация", "th": "จุดด่างดำ", "mn": "пигментаци",
+        "uz": "pigmentatsiya", "ar": "التصبغات", "es": "hiperpigmentación", "id": "hiperpigmentasi"
+      },
+      "alias": { "ko": ["색소 침착"] }
+    },
+    {
+      "id": "melasma",
+      "priority": 8,
+      "forms": {
+        "ko": "기미", "en": "melasma", "zh": "黄褐斑", "yue": "黃褐斑", "ja": "しみ",
+        "vi": "nám da", "ru": "мелазма", "th": "ฝ้า", "mn": "мелазм",
+        "uz": "melazma", "ar": "الكلف", "es": "melasma", "id": "melasma"
+      },
+      "alias": {}
+    },
+    {
+      "id": "swelling",
+      "priority": 9,
+      "forms": {
+        "ko": "붓기", "en": "swelling", "zh": "肿胀", "yue": "腫脹", "ja": "むくみ",
+        "vi": "sưng", "ru": "отёк", "th": "อาการบวม", "mn": "хавдалт",
+        "uz": "shish", "ar": "التورم", "es": "hinchazón", "id": "pembengkakan"
+      },
+      "alias": { "ko": ["부기"] }
+    },
+    {
+      "id": "bruising",
+      "priority": 9,
+      "forms": {
+        "ko": "멍", "en": "bruising", "zh": "淤青", "yue": "瘀青", "ja": "内出血",
+        "vi": "bầm tím", "ru": "синяки", "th": "รอยช้ำ", "mn": "хөхрөлт",
+        "uz": "koʻkarish", "ar": "الكدمات", "es": "hematomas", "id": "memar"
+      },
+      "alias": {}
+    },
+    {
+      "id": "anesthesia",
+      "priority": 9,
+      "forms": {
+        "ko": "마취", "en": "anesthesia", "zh": "麻醉", "yue": "麻醉", "ja": "麻酔",
+        "vi": "gây tê", "ru": "анестезия", "th": "การวางยาชา", "mn": "мэдээ алдуулалт",
+        "uz": "anesteziya", "ar": "التخدير", "es": "anestesia", "id": "anestesi"
+      },
+      "alias": {}
+    },
+    {
+      "id": "downtime",
+      "priority": 10,
+      "forms": {
+        "ko": "회복기간", "en": "downtime", "zh": "恢复期", "yue": "恢復期", "ja": "ダウンタイム",
+        "vi": "thời gian hồi phục", "ru": "период восстановления", "th": "ระยะพักฟื้น",
+        "mn": "сэргэх хугацаа", "uz": "tiklanish davri", "ar": "فترة التعافي",
+        "es": "tiempo de recuperación", "id": "masa pemulihan"
+      },
+      "alias": { "ko": ["회복 기간", "다운타임"] }
+    },
+    {
+      "id": "double_eyelid",
+      "priority": 10,
+      "forms": {
+        "ko": "쌍꺼풀", "en": "double eyelid surgery", "zh": "双眼皮", "yue": "雙眼皮", "ja": "二重まぶた",
+        "vi": "cắt mí", "ru": "пластика двойного века", "th": "ทำตาสองชั้น",
+        "mn": "давхар зовхи", "uz": "qoʻsh qovoq operatsiyasi", "ar": "جراحة الجفن المزدوج",
+        "es": "cirugía de doble párpado", "id": "operasi kelopak mata ganda"
+      },
+      "alias": { "ko": ["쌍커풀", "쌍꺼플"] }
+    },
+    {
+      "id": "rhinoplasty",
+      "priority": 10,
+      "forms": {
+        "ko": "코성형", "en": "rhinoplasty", "zh": "隆鼻", "yue": "隆鼻", "ja": "鼻整形",
+        "vi": "nâng mũi", "ru": "ринопластика", "th": "เสริมจมูก", "mn": "хамрын гоо засал",
+        "uz": "rinoplastika", "ar": "تجميل الأنف", "es": "rinoplastia", "id": "operasi hidung"
+      },
+      "alias": { "ko": ["코 성형"] }
+    },
+    {
+      "id": "liposuction",
+      "priority": 10,
+      "forms": {
+        "ko": "지방흡입", "en": "liposuction", "zh": "吸脂", "yue": "抽脂", "ja": "脂肪吸引",
+        "vi": "hút mỡ", "ru": "липосакция", "th": "ดูดไขมัน", "mn": "өөх сорох",
+        "uz": "liposaksiya", "ar": "شفط الدهون", "es": "liposucción", "id": "sedot lemak"
+      },
+      "alias": { "ko": ["지방 흡입"] }
+    },
+    {
+      "id": "thread_lift",
+      "priority": 8,
+      "forms": {
+        "ko": "실리프팅", "en": "thread lift", "zh": "线雕", "yue": "線雕", "ja": "糸リフト",
+        "vi": "căng chỉ", "ru": "нитевой лифтинг", "th": "ร้อยไหม", "mn": "утсан лифтинг",
+        "uz": "ip bilan tortish", "ar": "شد الوجه بالخيوط", "es": "hilos tensores",
+        "id": "tanam benang"
+      },
+      "alias": { "ko": ["실 리프팅"] }
+    },
+    {
+      "id": "skin_booster",
+      "priority": 8,
+      "forms": {
+        "ko": "스킨부스터", "en": "skin booster", "zh": "水光针", "yue": "水光針", "ja": "スキンブースター",
+        "vi": "tiêm dưỡng da", "ru": "скинбустер", "th": "สกินบูสเตอร์", "mn": "скин бустер",
+        "uz": "skin buster", "ar": "سكين بوستر", "es": "skin booster", "id": "skin booster"
+      },
+      "alias": { "ko": ["스킨 부스터", "물광주사"] }
+    },
+    {
+      "id": "laser_toning",
+      "priority": 7,
+      "forms": {
+        "ko": "레이저토닝", "en": "laser toning", "zh": "镭射净肤", "yue": "激光淨膚", "ja": "レーザートーニング",
+        "vi": "laser toning", "ru": "лазерный тонинг", "th": "เลเซอร์โทนนิ่ง",
+        "mn": "лазер тонинг", "uz": "lazer toning", "ar": "ليزر التونينغ",
+        "es": "láser toning", "id": "laser toning"
+      },
+      "alias": { "ko": ["레이저 토닝"] }
+    },
+    {
+      "id": "fat_graft",
+      "priority": 7,
+      "forms": {
+        "ko": "지방이식", "en": "fat grafting", "zh": "脂肪移植", "yue": "脂肪移植", "ja": "脂肪移植",
+        "vi": "cấy mỡ tự thân", "ru": "липофилинг", "th": "ฉีดไขมัน",
+        "mn": "өөх шилжүүлэн суулгах", "uz": "yogʻ koʻchirib oʻtkazish", "ar": "نقل الدهون",
+        "es": "injerto de grasa", "id": "cangkok lemak"
+      },
+      "alias": { "ko": ["지방 이식"] }
+    },
+    {
+      "id": "acne",
+      "priority": 7,
+      "forms": {
+        "ko": "여드름", "en": "acne", "zh": "痤疮", "yue": "暗瘡", "ja": "ニキビ",
+        "vi": "mụn trứng cá", "ru": "акне", "th": "สิว", "mn": "батга",
+        "uz": "husnbuzar", "ar": "حب الشباب", "es": "acné", "id": "jerawat"
+      },
+      "alias": {}
+    },
+    {
+      "id": "pore",
+      "priority": 6,
+      "forms": {
+        "ko": "모공", "en": "pores", "zh": "毛孔", "yue": "毛孔", "ja": "毛穴",
+        "vi": "lỗ chân lông", "ru": "поры", "th": "รูขุมขน", "mn": "сүв",
+        "uz": "teri teshiklari", "ar": "المسام", "es": "poros", "id": "pori-pori"
+      },
+      "alias": {}
+    },
+    {
+      "id": "wrinkle",
+      "priority": 7,
+      "forms": {
+        "ko": "주름", "en": "wrinkles", "zh": "皱纹", "yue": "皺紋", "ja": "しわ",
+        "vi": "nếp nhăn", "ru": "морщины", "th": "ริ้วรอย", "mn": "үрчлээ",
+        "uz": "ajinlar", "ar": "التجاعيد", "es": "arrugas", "id": "kerutan"
+      },
+      "alias": {}
+    },
+    {
+      "id": "stitch_removal",
+      "priority": 7,
+      "forms": {
+        "ko": "실밥제거", "en": "stitch removal", "zh": "拆线", "yue": "拆線", "ja": "抜糸",
+        "vi": "cắt chỉ", "ru": "снятие швов", "th": "ตัดไหม", "mn": "оёдол авах",
+        "uz": "choklarni olish", "ar": "إزالة الغرز", "es": "retirada de puntos",
+        "id": "lepas jahitan"
+      },
+      "alias": { "ko": ["실밥 제거", "발사"] }
+    },
+    {
+      "id": "side_effect",
+      "priority": 8,
+      "forms": {
+        "ko": "부작용", "en": "side effects", "zh": "副作用", "yue": "副作用", "ja": "副作用",
+        "vi": "tác dụng phụ", "ru": "побочные эффекты", "th": "ผลข้างเคียง",
+        "mn": "гаж нөлөө", "uz": "nojoʻya taʼsirlar", "ar": "الآثار الجانبية",
+        "es": "efectos secundarios", "id": "efek samping"
+      },
+      "alias": {}
+    },
+    {
+      "id": "consultation",
+      "priority": 5,
+      "forms": {
+        "ko": "대화", "en": "consultation", "zh": "咨询", "yue": "諮詢", "ja": "カウンセリング",
+        "vi": "tư vấn", "ru": "консультация", "th": "การให้คำปรึกษา", "mn": "зөвлөгөө",
+        "uz": "maslahat", "ar": "الاستشارة", "es": "consulta", "id": "konsultasi"
+      },
+      "alias": {}
+    },
+    {
+      "id": "aftercare",
+      "priority": 7,
+      "forms": {
+        "ko": "주의사항", "en": "aftercare instructions", "zh": "注意事项", "yue": "注意事項",
+        "ja": "注意事項", "vi": "lưu ý sau điều trị", "ru": "рекомендации после процедуры",
+        "th": "ข้อควรระวังหลังทำ", "mn": "анхаарах зүйлс", "uz": "parvarish boʻyicha koʻrsatmalar",
+        "ar": "تعليمات ما بعد العلاج", "es": "cuidados posteriores", "id": "perawatan pasca tindakan"
+      },
+      "alias": { "ko": ["주의 사항"] }
+    },
+    {
+      "id": "revisit",
+      "priority": 6,
+      "forms": {
+        "ko": "재방문", "en": "follow-up visit", "zh": "复诊", "yue": "覆診", "ja": "再来院",
+        "vi": "tái khám", "ru": "повторный визит", "th": "การนัดติดตามผล",
+        "mn": "дахин ирэх", "uz": "takroriy tashrif", "ar": "زيارة المتابعة",
+        "es": "visita de seguimiento", "id": "kunjungan lanjutan"
+      },
+      "alias": {}
+    },
+    {
+      "id": "sedation",
+      "priority": 7,
+      "forms": {
+        "ko": "수면마취", "en": "sedation", "zh": "睡眠麻醉", "yue": "睡眠麻醉", "ja": "睡眠麻酔",
+        "vi": "gây mê", "ru": "седация", "th": "การให้ยานอนหลับ",
+        "mn": "нойрны мэдээ алдуулалт", "uz": "sedatsiya", "ar": "التخدير الوريدي",
+        "es": "sedación", "id": "sedasi"
+      },
+      "alias": { "ko": ["수면 마취"] }
+    },
+    {
+      "id": "local_anesthesia",
+      "priority": 7,
+      "forms": {
+        "ko": "국소마취", "en": "local anesthesia", "zh": "局部麻醉", "yue": "局部麻醉", "ja": "局所麻酔",
+        "vi": "gây tê tại chỗ", "ru": "местная анестезия", "th": "การฉีดยาชาเฉพาะที่",
+        "mn": "хэсэг газрын мэдээ алдуулалт", "uz": "mahalliy anesteziya",
+        "ar": "التخدير الموضعي", "es": "anestesia local", "id": "anestesi lokal"
+      },
+      "alias": { "ko": ["국소 마취", "부분마취"] }
+    },
+    {
+      "id": "scar",
+      "priority": 7,
+      "forms": {
+        "ko": "흉터", "en": "scar", "zh": "疤痕", "yue": "疤痕", "ja": "傷跡",
+        "vi": "sẹo", "ru": "рубец", "th": "แผลเป็น", "mn": "сорви",
+        "uz": "chandiq", "ar": "الندبة", "es": "cicatriz", "id": "bekas luka"
+      },
+      "alias": {}
+    }
+  ]
+}

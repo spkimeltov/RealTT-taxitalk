@@ -1,0 +1,8 @@
+# 컨테이너는 stt-api-stt-admin-api 이미지에 이미 들어 있는 패키지를 그대로 쓴다.
+# 이 목록은 로컬 개발/테스트용이며, 버전은 서버 이미지에 맞췄다.
+fastapi==0.136.3
+uvicorn[standard]==0.48.0
+httpx==0.28.1
+numpy==2.2.6
+faster-whisper==1.2.1
+websockets==16.0
