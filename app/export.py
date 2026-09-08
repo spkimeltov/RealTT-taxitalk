@@ -92,6 +92,10 @@ def to_text(meta: dict, turns: Iterable[dict]) -> str:
             f"{_speaker_label(str(turn.get('speaker') or ''), patient_lang)}"
         )
         lines.append(f"  한국어 : {korean}")
+        # 사투리를 표준어로 옮겨 번역한 발화에만 붙는다. 번역이 어느 문장을 보고
+        # 나왔는지 나중에 되짚을 수 있어야 한다.
+        if turn.get("standard"):
+            lines.append(f"  표준어 : {turn['standard']}")
         lines.append(f"  {lang_label(patient_lang)} : {foreign}")
         lines.append("")
 
@@ -136,6 +140,7 @@ dl.meta dd { margin: 0; font-weight: 600; }
 .line { display: grid; grid-template-columns: 74px 1fr; gap: 12px; padding: 3px 0; }
 .tag { color: var(--muted); font-size: 12px; padding-top: 3px; }
 .text { font-size: 15px; white-space: pre-wrap; word-break: break-word; }
+.text.standard { color: var(--muted); font-size: 14px; }
 .empty { color: var(--muted); padding: 30px 0; text-align: center; }
 @media print {
   body { background: #fff; padding: 0; }
@@ -153,6 +158,14 @@ def to_html(meta: dict, turns: Iterable[dict]) -> str:
     for turn in turns:
         korean, foreign = _korean_and_foreign(turn)
         speaker = str(turn.get("speaker") or "")
+        standard = str(turn.get("standard") or "")
+        standard_row = (
+            f"""
+        <div class="line"><span class="tag">표준어</span>
+          <span class="text standard">{html.escape(standard)}</span></div>"""
+            if standard
+            else ""
+        )
         rows.append(
             f"""      <article class="turn">
         <div class="head">
@@ -162,7 +175,7 @@ def to_html(meta: dict, turns: Iterable[dict]) -> str:
           <span class="seq">#{html.escape(str(turn.get('seq') or ''))}</span>
         </div>
         <div class="line"><span class="tag">한국어</span>
-          <span class="text">{html.escape(korean)}</span></div>
+          <span class="text">{html.escape(korean)}</span></div>{standard_row}
         <div class="line"><span class="tag">{foreign_label}</span>
           <span class="text">{html.escape(foreign)}</span></div>
       </article>"""

@@ -75,6 +75,8 @@ class SessionStore:
         staff_lang: str = "ko",
         mic_mode: str = "single",
         clinic: str = "",
+        dialect_on: bool = False,
+        dialect_region: str = "",
     ) -> dict:
         started = now_kst()
         session_id = (
@@ -85,6 +87,10 @@ class SessionStore:
             "staff_lang": staff_lang,
             "patient_lang": patient_lang,
             "mic_mode": mic_mode,
+            # WebSocket 은 세션 설정을 meta 로만 넘겨받는다. 여기 없으면 대화 화면의
+            # 사투리 설정이 서버까지 닿지 않는다.
+            "dialect_on": bool(dialect_on),
+            "dialect_region": dialect_region,
             "clinic": clinic,
             "started_at": _iso(started),
             "ended_at": None,
@@ -92,7 +98,13 @@ class SessionStore:
         }
         directory = self._root / session_id
         await asyncio.to_thread(self._write_new, directory, meta)
-        log.info("대화 시작: %s (ko ↔ %s, mic=%s)", session_id, patient_lang, mic_mode)
+        log.info(
+            "대화 시작: %s (ko ↔ %s, mic=%s, 사투리=%s)",
+            session_id,
+            patient_lang,
+            mic_mode,
+            dialect_region if dialect_on else "off",
+        )
         return meta
 
     @staticmethod
@@ -204,9 +216,15 @@ def turn_entry(
     dst: str,
     original: str,
     translated: str,
+    standard: str = "",
     metrics: Optional[dict[str, Any]] = None,
 ) -> dict:
-    """`transcript.jsonl` 한 줄의 형태를 한곳에서 정한다."""
+    """`transcript.jsonl` 한 줄의 형태를 한곳에서 정한다.
+
+    `original` 은 늘 기사가 실제로 한 말이다. 사투리를 표준어로 옮겨 번역했다면
+    그 표준어가 `standard` 로 따로 붙는다. 사투리를 쓰지 않은 발화에는 없는 항목이라,
+    빈 값으로 모든 줄을 늘리지 않는다.
+    """
     entry: dict[str, Any] = {
         "seq": seq,
         "at": _iso(now_kst()),
@@ -216,6 +234,8 @@ def turn_entry(
         "original": original,
         "translated": translated,
     }
+    if standard:
+        entry["standard"] = standard
     if metrics:
         entry["metrics"] = metrics
     return entry

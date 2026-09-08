@@ -12,6 +12,8 @@ const SIDE_CODE = { shared: 0, staff: 1, patient: 2 };
 const STAFF_LANG = 'ko';
 const DEVICE_KEY = 'taxitalk.devices';
 const MIC_MODE_KEY = 'taxitalk.micMode';
+const DIALECT_ON_KEY = 'taxitalk.dialectOn';
+const DIALECT_REGION_KEY = 'taxitalk.dialectRegion';
 
 // 시작 화면에 놓을 카드 수의 상한. 이보다 많으면 한눈에 안 들어온다.
 const CARD_MAX = 15;
@@ -174,6 +176,9 @@ class taxitalk {
     this.retryTimer = null;
     this.micMode = 'single';
     this.devices = { shared: '', staff: '', patient: '' };
+    // 기사가 사투리를 쓰는 지역. 켜 두면 한국어 발화를 표준어로 옮긴 뒤 번역한다.
+    this.dialectOn = false;
+    this.dialectRegion = '';
     // code → {code, label, label_ko, name, tier, rtl, ui}
     this.languages = new Map();
     this.featured = [];
@@ -233,6 +238,7 @@ class taxitalk {
     try {
       Object.assign(this.devices, JSON.parse(localStorage.getItem(DEVICE_KEY) || '{}'));
     } catch (_) { /* 저장값이 깨졌으면 무시 */ }
+    this.loadDialectSetting();
 
     this.loadLanguages();
     this.buildLanguageCards();
@@ -257,6 +263,36 @@ class taxitalk {
 
   langInfo(code) {
     return (code && this.languages.get(code)) || null;
+  }
+
+  /* -------------------------------------------------------------- 사투리 */
+  // 표준어 변환 게이트웨이를 쓸 수 없는 배포에서는 설정 자체를 감춘다. 켤 수 없는
+  // 스위치를 보여 주면 꺼 둔 것과 구분되지 않는다.
+  dialectAvailable() {
+    return Boolean(this.config && this.config.dialect && this.config.dialect.available);
+  }
+
+  dialectRegions() {
+    return (this.config && this.config.dialect && this.config.dialect.regions) || [];
+  }
+
+  dialectRegionLabel(code) {
+    const found = this.dialectRegions().find((region) => region.code === code);
+    return found ? found.label : code;
+  }
+
+  loadDialectSetting() {
+    const conf = (this.config && this.config.dialect) || {};
+    // 한 번도 고른 적이 없으면 서버 기본값을 따른다. 껐다는 저장값과 구분해야 하므로
+    // 값이 없는 경우(null)만 기본값으로 본다.
+    const saved = localStorage.getItem(DIALECT_ON_KEY);
+    this.dialectOn = saved === null ? Boolean(conf.default_on) : saved === '1';
+
+    const codes = this.dialectRegions().map((region) => region.code);
+    const stored = localStorage.getItem(DIALECT_REGION_KEY) || conf.default_region || '';
+    this.dialectRegion = codes.includes(stored) ? stored : codes[0] || '';
+
+    if (!this.dialectAvailable()) this.dialectOn = false;
   }
 
   // 카드 순서는 서버의 `PATIENT_LANGUAGES` 를 그대로 따른다. 탑승객이 늘 같은 자리에서
@@ -444,10 +480,13 @@ class taxitalk {
     this.setMicState('idle');
     this.paused = false;
     this.updatePauseLabel();
-    this.el.micNote.textContent =
+    const micNote =
       this.micMode === 'dual'
         ? '마이크 2개 모드입니다. 설정에서 기사용·탑승객용 입력장치를 확인해 주세요.'
         : '공용 마이크 1개 모드입니다. 말하는 언어로 화자를 구분합니다.';
+    this.el.micNote.textContent = this.dialectOn
+      ? `${micNote} ${this.dialectRegionLabel(this.dialectRegion)} 사투리를 표준어로 옮겨 번역합니다.`
+      : micNote;
     for (const card of $$('.lang-card')) card.disabled = false;
   }
 
@@ -457,7 +496,12 @@ class taxitalk {
       const response = await fetch(apiUrl('api/sessions'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patient_lang: patientLang, mic_mode: this.micMode }),
+        body: JSON.stringify({
+          patient_lang: patientLang,
+          mic_mode: this.micMode,
+          dialect_on: this.dialectOn,
+          dialect_region: this.dialectRegion,
+        }),
       });
       if (!response.ok) throw new Error(`session ${response.status}`);
       this.session = await response.json();
@@ -735,6 +779,12 @@ class taxitalk {
     this.ws.send(JSON.stringify(payload));
   }
 
+  // 진행 중인 대화에 바뀐 사투리 설정을 알린다. 연결이 없으면 조용히 넘어간다.
+  // 다음 대화는 어차피 세션을 만들 때 같은 값을 싣는다.
+  sendDialectSetting() {
+    this.send({ type: 'dialect', on: this.dialectOn, region: this.dialectRegion });
+  }
+
   sendAudio(side, pcm) {
     if (!this.ready()) return;
     const frame = new Uint8Array(2 + pcm.byteLength);
@@ -789,6 +839,22 @@ class taxitalk {
         this.renderTurn(turn);
         break;
       }
+      case 'standard': {
+        // 사투리를 표준어로 옮긴 문장. 원문은 그대로 두고 아래에 작게 덧붙인다.
+        // 번역이 어느 문장을 보고 나왔는지 기사가 바로 확인할 수 있어야 한다.
+        const turn = this.turns.get(msg.turn);
+        if (!turn) break;
+        turn.standard = msg.text;
+        this.renderTurn(turn);
+        break;
+      }
+      case 'dialect_ack':
+        this.toast(
+          msg.on
+            ? `${this.dialectRegionLabel(msg.region)} 사투리를 다음 발화부터 적용합니다.`
+            : '사투리 변환을 껐습니다.'
+        );
+        break;
       case 'translation_delta': {
         const turn = this.turns.get(msg.turn);
         if (!turn) break;
@@ -837,6 +903,7 @@ class taxitalk {
       dst: msg.dst || null,
       original: '',
       translated: '',
+      standard: '',
       status: 'listening',
       nodes: {},
     };
@@ -845,13 +912,15 @@ class taxitalk {
       const article = document.createElement('article');
       article.className = 'bubble';
       article.innerHTML =
-        '<div class="who"></div><div class="primary"></div><div class="secondary"></div>';
+        '<div class="who"></div><div class="primary"></div><div class="secondary"></div>'
+        + '<div class="standard" lang="ko" dir="ltr" hidden></div>';
       this.el.screens[screen].log.append(article);
       turn.nodes[screen] = {
         root: article,
         who: $('.who', article),
         primary: $('.primary', article),
         secondary: $('.secondary', article),
+        standard: $('.standard', article),
       };
     }
 
@@ -926,6 +995,12 @@ class taxitalk {
         node.primary.textContent = '';
       }
       node.secondary.textContent = secondary;
+
+      // 표준어는 기사만 본다. 탑승객 화면에 한국어를 한 줄 더 얹어 봐야 읽지 못한다.
+      // 배치를 합치면 기사와 탑승객이 staff 화면을 함께 보므로, 그때도 여기가 맞다.
+      const showStandard = screen === 'staff' && Boolean(turn.standard);
+      node.standard.hidden = !showStandard;
+      node.standard.textContent = showStandard ? turn.standard : '';
     }
     this.scrollLogs();
   }
@@ -1022,6 +1097,14 @@ class taxitalk {
         <label>탑승객 마이크</label>
         <select data-device="patient"></select>
       </div>
+      <div class="field" data-dialect hidden>
+        <label class="check">
+          <input type="checkbox" data-dialect-on>
+          <span>지역 사투리 사용</span>
+        </label>
+        <select data-dialect-region></select>
+        <p class="hint">기사님의 사투리를 표준어로 옮긴 뒤 번역합니다. 화면에는 하신 말씀 그대로 남습니다.</p>
+      </div>
       <div class="sheet-actions">
         <button class="btn" type="button" data-close>취소</button>
         <button class="btn primary" type="button" data-save>저장</button>
@@ -1052,6 +1135,23 @@ class taxitalk {
     }
     applyMode(this.micMode);
 
+    const dialectField = $('[data-dialect]', wrap);
+    const dialectOn = $('[data-dialect-on]', wrap);
+    const dialectRegion = $('[data-dialect-region]', wrap);
+    dialectField.hidden = !this.dialectAvailable();
+    for (const region of this.dialectRegions()) {
+      const option = document.createElement('option');
+      option.value = region.code;
+      option.textContent = `${region.label} (${region.code})`;
+      dialectRegion.append(option);
+    }
+    dialectOn.checked = this.dialectOn;
+    dialectRegion.value = this.dialectRegion;
+    dialectRegion.disabled = !dialectOn.checked;
+    dialectOn.addEventListener('change', () => {
+      dialectRegion.disabled = !dialectOn.checked;
+    });
+
     $('[data-close]', wrap).addEventListener('click', () => this.closeSheet());
     $('[data-save]', wrap).addEventListener('click', async () => {
       const mode = $('[name="micmode"]:checked', wrap).value;
@@ -1062,6 +1162,16 @@ class taxitalk {
       this.micMode = mode;
       localStorage.setItem(MIC_MODE_KEY, mode);
       localStorage.setItem(DEVICE_KEY, JSON.stringify(this.devices));
+
+      if (this.dialectAvailable()) {
+        this.dialectOn = dialectOn.checked;
+        this.dialectRegion = dialectRegion.value;
+        localStorage.setItem(DIALECT_ON_KEY, this.dialectOn ? '1' : '0');
+        localStorage.setItem(DIALECT_REGION_KEY, this.dialectRegion);
+        // 세션 메타는 대화를 시작할 때 굳는다. 진행 중인 대화에는 따로 알려서
+        // 다음 발화부터 바뀐 설정이 걸리게 한다.
+        this.sendDialectSetting();
+      }
       this.closeSheet();
 
       if (this.session) {

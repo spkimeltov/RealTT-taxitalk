@@ -57,7 +57,7 @@ class Translator:
         src: str,
         dst: str,
         terms: Sequence[tuple[str, str]],
-        dialect_enabled: bool = False,
+        dialect_region: str = "",
         dialect_notes: Sequence[str] = (),
     ) -> str:
         source, target = lang_name(src), lang_name(dst)
@@ -83,16 +83,16 @@ class Translator:
             "own, and do not soften what was said. Convey exactly what the speaker stated.",
             f"- Write natural {target} as it would be spoken in a taxi or on a guided tour.",
         ]
-        if src == "ko" and dialect_enabled:
-            # 기사·가이드는 대개 부산 사람이다. 사투리를 표준어로 옮기려 들면 그 자체가
-            # 번역이 되어 뜻이 한 겹 더 멀어지므로, 알아듣고 곧장 대상 언어로 옮기게 한다.
+        if src == "ko" and dialect_region:
+            # 사투리를 표준어로 옮기려 들면 그 자체가 번역이 되어 뜻이 한 겹 더
+            # 멀어지므로, 알아듣고 곧장 대상 언어로 옮기게 한다.
             #
-            # 방언을 껐을 때(`KO_DIALECT=off`) 이 문단이 남으면 표준어만 오는 현장에서
-            # 없는 사투리를 찾으라는 지시가 매 발화에 붙는다. 스위치 하나로 세 층
-            # (whisper 프롬프트 · 뜻풀이 주석 · 이 규칙)이 함께 꺼지게 묶어 둔다.
+            # 이 문단은 사투리 원문을 그대로 넘길 때만 붙는다. JEJUMA 로 표준어 변환에
+            # 성공한 발화에까지 남으면, 표준어만 담긴 문장에서 없는 사투리를 찾으라는
+            # 지시가 매번 붙는다.
             lines.append(
-                "- The Korean speaker is a local from Busan and may speak the Gyeongsang "
-                "(Busan) dialect. Understand the dialect and render its meaning directly "
+                f"- The Korean speaker is a local and may speak the {dialect_region} "
+                f"dialect. Understand the dialect and render its meaning directly "
                 f"in standard {target}. Do not restate it in standard Korean, do not "
                 "translate dialect endings literally, and do not treat unfamiliar dialect "
                 "words as speech recognition errors."
@@ -105,8 +105,9 @@ class Translator:
             )
         if dialect_notes:
             notes = "\n".join(f"- {note}" for note in dialect_notes)
+            region = dialect_region or "Korean"
             lines.append(
-                "The input contains Gyeongsang dialect. These notes give the standard "
+                f"The input contains {region} dialect. These notes give the standard "
                 f"Korean meaning of what appeared; translate accordingly:\n{notes}"
             )
         return "\n".join(lines)
@@ -118,10 +119,10 @@ class Translator:
         dst: str,
         history: Sequence[tuple[str, str]],
         terms: Sequence[tuple[str, str]],
-        dialect_enabled: bool = False,
+        dialect_region: str = "",
         dialect_notes: Sequence[str] = (),
     ) -> list[dict]:
-        system = self._system_prompt(src, dst, terms, dialect_enabled, dialect_notes)
+        system = self._system_prompt(src, dst, terms, dialect_region, dialect_notes)
         messages: list[dict] = []
         if not self._merge_system:
             messages.append({"role": "system", "content": system})
@@ -156,7 +157,7 @@ class Translator:
         dst: str,
         history: Iterable[tuple[str, str]] = (),
         terms: Iterable[tuple[str, str]] = (),
-        dialect_enabled: bool = False,
+        dialect_region: str = "",
         dialect_notes: Iterable[str] = (),
     ) -> AsyncIterator[str]:
         """번역 델타를 순서대로 yield 한다."""
@@ -165,7 +166,7 @@ class Translator:
         notes = list(dialect_notes)
         try:
             async for piece in self._stream_once(
-                text, src, dst, hist, term_list, dialect_enabled, notes
+                text, src, dst, hist, term_list, dialect_region, notes
             ):
                 yield piece
             return
@@ -176,7 +177,7 @@ class Translator:
             self._merge_system = True
 
         async for piece in self._stream_once(
-            text, src, dst, hist, term_list, dialect_enabled, notes
+            text, src, dst, hist, term_list, dialect_region, notes
         ):
             yield piece
 
@@ -187,13 +188,13 @@ class Translator:
         dst: str,
         history: Sequence[tuple[str, str]],
         terms: Sequence[tuple[str, str]],
-        dialect_enabled: bool = False,
+        dialect_region: str = "",
         dialect_notes: Sequence[str] = (),
     ) -> AsyncIterator[str]:
         url = f"{self._s.vllm_base_url}/chat/completions"
         headers = {"Authorization": f"Bearer {self._s.vllm_api_key}"}
         payload = self._payload(
-            self._messages(text, src, dst, history, terms, dialect_enabled, dialect_notes)
+            self._messages(text, src, dst, history, terms, dialect_region, dialect_notes)
         )
 
         async with self._client.stream("POST", url, json=payload, headers=headers) as resp:

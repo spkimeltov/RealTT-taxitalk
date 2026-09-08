@@ -37,6 +37,30 @@ MIC_DUAL = "dual"
 MIC_MODES = (MIC_SINGLE, MIC_DUAL)
 SCREEN_LAYOUTS = ("single", "dual")
 
+# --------------------------------------------------------------- 지역 사투리
+# JEJUMA-002 게이트웨이가 받는 region 코드와 화면에 뜨는 이름. 코드는 게이트웨이의
+# Region 리터럴과 한 글자도 다르면 400 이 돌아온다(`jeonla`, `jeolla` 가 아니다).
+# 여기 적은 순서가 곧 설정창 선택 상자의 순서다.
+DIALECT_REGIONS: dict[str, str] = {
+    "gyeongsang": "경상",
+    "jeonla": "전라",
+    "chungcheong": "충청",
+    "gangwon": "강원",
+    "jeju": "제주",
+}
+DIALECT_REGION_CODES = tuple(DIALECT_REGIONS)
+
+# 번역 프롬프트에 적을 영문 지역명. 표준어 변환이 실패해 사투리 원문을 그대로
+# 번역할 때, 어느 지역 말인지 알려 주는 문단에 들어간다. 게이트웨이 코드(`jeonla`)와
+# 영어에서 통용되는 표기(`Jeolla`)가 달라 따로 둔다.
+DIALECT_REGION_NAMES: dict[str, str] = {
+    "gyeongsang": "Gyeongsang",
+    "jeonla": "Jeolla",
+    "chungcheong": "Chungcheong",
+    "gangwon": "Gangwon",
+    "jeju": "Jeju",
+}
+
 # --------------------------------------------------------------- 언어 카탈로그
 # faster-whisper large-v3 가 인식하는 99개 가운데, 인식률과 번역 품질이 함께 받쳐
 # 주는 34개만 남겼다. 이 표가 곧 서비스가 다룰 수 있는 언어의 상한이다. 뺀 언어는
@@ -569,12 +593,15 @@ class Settings:
     history_turns: int = 3
 
     # --- 방언 (한국어 화자 쪽에만 적용) ---
-    # `data/dialect/<이름>.json` 의 이름. `off` 면 방언 보정을 끈다.
+    # 사투리는 두 경로로 다룬다. 화면에서 켜고 끄는 것은 아래 `dialect_*` 쪽이다.
     #
-    # 기본은 꺼짐이다. 표준어를 기준으로 인식·번역을 먼저 맞춰 두고, 그 기준선과
-    # 비교할 수 있게 된 뒤에 `gyeongsang` 으로 올린다. 켜면 세 곳이 함께 달라진다.
-    # whisper initial_prompt 에 사투리 표기가 붙고, 원문에 나온 방언의 뜻풀이가
-    # 번역 프롬프트에 실리고, 번역 지시문에 사투리 문단이 하나 추가된다.
+    # 1. **표준어 변환** — JEJUMA-002 게이트웨이에 발화를 보내 표준어로 옮기고, 그
+    #    표준어를 번역 입력으로 쓴다. 사투리 원문은 기사 화면과 대화기록에 남는다.
+    # 2. **뜻풀이 주석** — 1이 실패하거나 꺼져 있을 때의 경로다. 원문을 고치지 않고
+    #    `data/dialect/<지역>.json` 의 뜻풀이만 번역 프롬프트에 붙인다.
+    #
+    # 어느 경로든 whisper `initial_prompt` 에는 사투리 표기를 들려준다. 받아쓰기가
+    # 표준어로 새면 변환할 사투리가 애초에 남지 않는다.
     ko_dialect: str = "off"
     dialect_path: str = ""
     # whisper initial_prompt 에 섞을 사투리 예시 수. 용어집 프롬프트와 224 토큰을
@@ -582,6 +609,21 @@ class Settings:
     dialect_prompt_words: int = 8
     # 번역 프롬프트에 붙일 뜻풀이 수의 상한.
     dialect_max_notes: int = 8
+    # 화면에서 지역을 고르지 않았을 때 쓰는 기본 지역.
+    dialect_region: str = "gyeongsang"
+    # 설정창 체크박스의 초기 상태. 기사가 한 번 바꾸면 그 브라우저에 저장된다.
+    dialect_default_on: bool = False
+
+    # --- 표준어 변환 (JEJUMA-002 게이트웨이) ---
+    # 개발 중에는 사내망 `192.168.0.208`, 배포 서버에서는 공인 `106.254.227.226` 이다.
+    # 주소나 키가 비어 있으면 변환 경로 자체를 끄고 설정창에서 체크박스를 감춘다.
+    jejuma_base_url: str = "http://192.168.0.208:48125"
+    jejuma_api_key: str = ""
+    # 번역 앞에 끼어드는 왕복이라 넉넉히 잡으면 통역 전체가 늦어진다. 넘기면 원문
+    # 그대로 번역하고 뜻풀이 경로로 되돌아간다.
+    jejuma_timeout_sec: float = 3.0
+    jejuma_temperature: float = 0.1
+    jejuma_max_tokens: int = 256
 
     # --- 전문용어 ---
     glossary_path: str = ""
@@ -646,6 +688,13 @@ class Settings:
             dialect_path=_s("DIALECT_PATH"),
             dialect_prompt_words=_i("DIALECT_PROMPT_WORDS", 8),
             dialect_max_notes=_i("DIALECT_MAX_NOTES", 8),
+            dialect_region=_choice("DIALECT_REGION", "gyeongsang", DIALECT_REGION_CODES),
+            dialect_default_on=_b("DIALECT_DEFAULT_ON", False),
+            jejuma_base_url=_s("JEJUMA_BASE_URL", "http://192.168.0.208:48125").rstrip("/"),
+            jejuma_api_key=_s("JEJUMA_API_KEY"),
+            jejuma_timeout_sec=_f("JEJUMA_TIMEOUT_SEC", 3.0),
+            jejuma_temperature=_f("JEJUMA_TEMPERATURE", 0.1),
+            jejuma_max_tokens=_i("JEJUMA_MAX_TOKENS", 256),
             glossary_path=_s("GLOSSARY_PATH"),
             glossary_prompt_terms=_i("GLOSSARY_PROMPT_TERMS", 24),
             session_dir=_s("SESSION_DIR", "/srv/taxitalk/data/sessions"),
@@ -689,6 +738,17 @@ def is_rtl(code: str) -> bool:
 def ui_text(code: str) -> dict:
     """해당 언어의 화면 문구. 없으면 영어로 대체한다."""
     return UI_TEXT.get((code or "").lower()) or UI_TEXT["en"]
+
+
+def dialect_region_label(code: str) -> str:
+    """지역 사투리의 한국어 표기. 모르는 코드는 그대로 돌려준다."""
+    code = (code or "").lower()
+    return DIALECT_REGIONS.get(code, code)
+
+
+def dialect_region_entries() -> list[dict]:
+    """설정창 선택 상자를 그리는 데 필요한 값. 적어 둔 순서를 지킨다."""
+    return [{"code": code, "label": label} for code, label in DIALECT_REGIONS.items()]
 
 
 def lang_entry(code: str) -> dict:

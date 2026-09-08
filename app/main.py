@@ -14,16 +14,19 @@ from fastapi.staticfiles import StaticFiles
 
 from . import __version__
 from .config import (
+    DIALECT_REGIONS,
     MIC_MODES,
     STAFF_LANG,
     UI_TEXT,
     Settings,
+    dialect_region_entries,
     lang_entry,
     ui_text,
 )
 from .dialect import Dialect
 from .export import FORMATS, render
 from .glossary import Glossary
+from .jejuma import Standardizer
 from .session import ConsultSession
 from .storage import SessionNotFound, SessionStore
 from .stt import SttEngine
@@ -58,17 +61,22 @@ async def lifespan(app: FastAPI):
     app.state.translator = Translator(SETTINGS)
     app.state.glossary = Glossary.load(SETTINGS.glossary_path or None)
     app.state.dialect = Dialect.load(SETTINGS.ko_dialect, SETTINGS.dialect_path or None)
+    # 지역별 대응표는 기동 때 다 읽어 둔다. 대화 도중에도 지역을 바꿀 수 있어서
+    # 그때마다 파일을 여는 것보다 낫다. 다섯 개를 합쳐도 몇십 KB다.
+    app.state.dialects = {code: Dialect.load(code) for code in DIALECT_REGIONS}
+    app.state.standardizer = Standardizer(SETTINGS)
     app.state.store = SessionStore(SETTINGS.session_dir)
     app.state.store.ensure_root()
     app.state.load_error = None
     app.state.loader = asyncio.create_task(_load_models(app))
     log.info(
-        "기동: stt=%s mt=%s@%s 용어 %s개 방언=%s 기록=%s",
+        "기동: stt=%s mt=%s@%s 용어 %s개 방언=%s 표준어변환=%s 기록=%s",
         SETTINGS.whisper_model,
         SETTINGS.vllm_model,
         SETTINGS.vllm_base_url,
         len(app.state.glossary),
         app.state.dialect.label or "off",
+        SETTINGS.jejuma_base_url if app.state.standardizer.available else "off",
         SETTINGS.session_dir,
     )
     try:
@@ -81,6 +89,7 @@ async def lifespan(app: FastAPI):
         except with_suppressed:
             pass
         await app.state.translator.aclose()
+        await app.state.standardizer.aclose()
         app.state.stt.close()
 
 
@@ -117,6 +126,15 @@ async def health() -> dict:
             "label": app.state.dialect.label,
             "rules": len(app.state.dialect),
             "source": app.state.dialect.source,
+            # 지역별 프롬프트 표기 수. 0 이면 그 지역 대응표를 못 읽은 것이다.
+            "regions": {
+                code: table.prompt_terms for code, table in app.state.dialects.items()
+            },
+        },
+        "standardizer": {
+            "available": app.state.standardizer.available,
+            "base_url": SETTINGS.jejuma_base_url,
+            "timeout_sec": SETTINGS.jejuma_timeout_sec,
         },
         "sessions": {"dir": SETTINGS.session_dir},
     }
@@ -138,6 +156,14 @@ async def config() -> dict:
         "staff_ui": ui_text(STAFF_LANG),
         "mic_mode": SETTINGS.mic_mode,
         "screen_layout": SETTINGS.screen_layout,
+        "dialect": {
+            # 게이트웨이 주소와 키가 다 채워졌을 때만 설정창에 체크박스를 띄운다.
+            # 켤 수 없는 스위치를 보여 주면 꺼져 있는 것과 구분이 안 된다.
+            "available": app.state.standardizer.available,
+            "regions": dialect_region_entries(),
+            "default_region": SETTINGS.dialect_region,
+            "default_on": SETTINGS.dialect_default_on,
+        },
         "clinic_name": SETTINGS.clinic_name,
         "auth_required": bool(SETTINGS.app_api_key),
         "sample_rate": 16000,
@@ -170,11 +196,20 @@ async def create_session(
     if mic_mode not in MIC_MODES:
         mic_mode = SETTINGS.mic_mode
 
+    # 지역을 모르는 값으로 보내와도 대화는 시작돼야 한다. 서버 기본값으로 되돌린다.
+    dialect_region = str(payload.get("dialect_region") or "").lower()
+    if dialect_region not in DIALECT_REGIONS:
+        dialect_region = SETTINGS.dialect_region
+    # 변환기를 쓸 수 없는 배포에서는 켜 달라고 해도 켜지 않는다.
+    dialect_on = bool(payload.get("dialect_on")) and app.state.standardizer.available
+
     return await app.state.store.create(
         patient_lang,
         staff_lang=STAFF_LANG,
         mic_mode=mic_mode,
         clinic=SETTINGS.clinic_name,
+        dialect_on=dialect_on,
+        dialect_region=dialect_region,
     )
 
 
@@ -262,6 +297,8 @@ async def session_ws(ws: WebSocket) -> None:
         translator=ws.app.state.translator,
         glossary=ws.app.state.glossary,
         dialect=ws.app.state.dialect,
+        dialects=ws.app.state.dialects,
+        standardizer=ws.app.state.standardizer,
         store=ws.app.state.store,
         settings=ws.app.state.settings,
         meta=meta,

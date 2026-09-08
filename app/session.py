@@ -6,6 +6,8 @@
     [VAD 감지] start ─ 오디오 프레임 … ─ [무음 700ms] end
                          │                        │
                          └ partial 자막            └ 언어 확정 → 전사 → 용어 보정
+                                                     → transcript
+                                                     → (사투리면) 표준어 변환
                                                      → translation_delta*
                                                      → turn_done → 기록 저장
 
@@ -33,6 +35,8 @@ from starlette.websockets import WebSocketDisconnect
 
 from .config import (
     BYTES_PER_SEC,
+    DIALECT_REGION_NAMES,
+    DIALECT_REGIONS,
     MIC_SINGLE,
     SIDE_BY_CODE,
     SIDE_PATIENT,
@@ -43,6 +47,7 @@ from .config import (
 )
 from .dialect import Dialect
 from .glossary import Glossary
+from .jejuma import Standardizer
 from .storage import SessionStore, turn_entry
 from .stt import SttEngine
 from .translate import Translator, strip_wrapping_quotes
@@ -85,6 +90,8 @@ class ConsultSession:
         translator: Translator,
         glossary: Glossary,
         dialect: Dialect,
+        dialects: dict[str, Dialect],
+        standardizer: Standardizer,
         store: SessionStore,
         settings: Settings,
         meta: dict,
@@ -93,7 +100,11 @@ class ConsultSession:
         self._stt = stt
         self._translator = translator
         self._glossary = glossary
-        self._dialect = dialect
+        # `dialect` 는 사투리를 끄고 있을 때 쓰는 서버 기본값(`KO_DIALECT`)이고,
+        # `dialects` 는 화면에서 고른 지역의 대응표다. 지역이 정해지면 후자가 이긴다.
+        self._default_dialect = dialect
+        self._dialects = dialects
+        self._standardizer = standardizer
         self._store = store
         self._s = settings
 
@@ -101,6 +112,9 @@ class ConsultSession:
         self._patient_lang = str(meta["patient_lang"])
         self._mic_mode = str(meta.get("mic_mode") or settings.mic_mode)
         self._candidates = (STAFF_LANG, self._patient_lang)
+
+        self._dialect_on = bool(meta.get("dialect_on")) and standardizer.available
+        self._dialect_region = self._clean_region(meta.get("dialect_region"))
 
         self._send_lock = asyncio.Lock()
         self._slots: dict[str, Turn] = {}
@@ -110,6 +124,50 @@ class ConsultSession:
         # 방향별로 직전 대화를 따로 기억한다. 섞으면 모델이 출력 언어를 헷갈린다.
         self._history: dict[str, list[tuple[str, str]]] = {}
         self._max_bytes = int(self._s.max_utterance_sec * BYTES_PER_SEC)
+
+    # -------------------------------------------------------------- 사투리 설정
+    def _clean_region(self, value: object) -> str:
+        """모르는 지역 코드는 서버 기본값으로 되돌린다."""
+        region = str(value or "").lower()
+        return region if region in DIALECT_REGIONS else self._s.dialect_region
+
+    @property
+    def _dialect(self) -> Dialect:
+        """지금 세션에 걸린 대응표. whisper 프롬프트와 뜻풀이가 여기서 나온다."""
+        if not self._dialect_on:
+            return self._default_dialect
+        return self._dialects.get(self._dialect_region) or self._default_dialect
+
+    @property
+    def _dialect_name(self) -> str:
+        """번역 프롬프트에 적을 영문 지역명. 사투리를 안 쓰면 빈 문자열."""
+        code = self._dialect_region if self._dialect_on else self._default_dialect.name
+        return DIALECT_REGION_NAMES.get(code, "")
+
+    async def _standardize(
+        self, turn: Turn, source_text: str, src: str, metrics: dict
+    ) -> Optional[str]:
+        """사투리를 표준어로 옮긴다. 못 옮겼으면 `None`.
+
+        `transcript` 를 이미 보낸 뒤에 부른다. 원문은 지체 없이 화면에 뜨고, 이
+        왕복은 번역 앞에만 끼어든다. 결과가 나오면 `standard` 로 따로 내려보내
+        기사 화면이 원문 아래에 작게 덧붙이게 한다.
+        """
+        if not self._dialect_on or src != STAFF_LANG:
+            return None
+
+        started = time.perf_counter()
+        standard = await self._standardizer.to_standard(source_text, self._dialect_region)
+        metrics["dialect_region"] = self._dialect_region
+        metrics["dialect_ms"] = int((time.perf_counter() - started) * 1000)
+        if standard is None:
+            return None
+
+        # 표준어로 말했으면 변환기가 원문을 그대로 돌려준다. 같은 문장을 한 번 더
+        # 띄워 봐야 화면만 어지럽다.
+        if standard != source_text:
+            await self._send({"type": "standard", "turn": turn.id, "text": standard})
+        return standard
 
     # ------------------------------------------------------------------ 루프
     async def run(self) -> None:
@@ -125,6 +183,8 @@ class ConsultSession:
                 "stt_model": self._stt.model_name,
                 "mt_model": self._s.vllm_model,
                 "glossary_terms": len(self._glossary),
+                "dialect_on": self._dialect_on,
+                "dialect_region": self._dialect_region,
             }
         )
         try:
@@ -172,10 +232,34 @@ class ConsultSession:
         elif kind == "reset":
             self._history.clear()
             await self._send({"type": "reset"})
+        elif kind == "dialect":
+            await self._set_dialect(data)
         elif kind == "ping":
             await self._send({"type": "pong", "t": data.get("t")})
         else:
             await self._send({"type": "error", "message": f"unknown_type:{kind}"})
+
+    async def _set_dialect(self, data: dict) -> None:
+        """대화 도중 설정창에서 사투리를 켜거나 지역을 바꿨을 때.
+
+        세션 메타는 시작할 때 굳어지므로 여기서 갱신하지 않는다. 기사가 설정을
+        고치고 나서 다음 발화부터 바로 달라지는 편이, 대화를 끊고 다시 시작하게
+        하는 것보다 낫다.
+        """
+        self._dialect_on = bool(data.get("on")) and self._standardizer.available
+        self._dialect_region = self._clean_region(data.get("region"))
+        log.info(
+            "세션 %s 사투리 설정 변경: %s",
+            self._session_id,
+            self._dialect_region if self._dialect_on else "off",
+        )
+        await self._send(
+            {
+                "type": "dialect_ack",
+                "on": self._dialect_on,
+                "region": self._dialect_region,
+            }
+        )
 
     def _side_of(self, data: dict) -> str:
         side = str(data.get("side") or "").lower()
@@ -440,21 +524,35 @@ class ConsultSession:
                 }
             )
 
-            terms = self._glossary.match(source_text, src, dst)
+            # 사투리는 한국어 발화에만 해당한다. 탑승객 언어에는 붙일 것이 없다.
+            standard = await self._standardize(turn, source_text, src, metrics)
+            # 번역 모델이 읽는 문장. 변환이 됐으면 표준어, 아니면 사투리 원문이다.
+            mt_input = standard or source_text
+
+            terms = self._glossary.match(mt_input, src, dst)
             if terms:
                 metrics["terms"] = [f"{a}->{b}" for a, b in terms]
 
-            # 사투리 뜻풀이는 한국어 발화에만 붙인다. 탑승객 언어에는 해당이 없다.
-            notes = (
-                self._dialect.notes(source_text, self._s.dialect_max_notes)
-                if src == STAFF_LANG
-                else []
-            )
+            # 뜻풀이와 사투리 지시문은 표준어 변환이 실패했을 때만 쓴다. 이미 표준어로
+            # 옮긴 문장에까지 붙이면 모델이 있지도 않은 사투리를 찾는다.
+            notes: list[str] = []
+            region_name = ""
+            if src == STAFF_LANG and standard is None:
+                notes = self._dialect.notes(source_text, self._s.dialect_max_notes)
+                region_name = self._dialect_name
             if notes:
-                metrics["dialect"] = len(notes)
+                metrics["dialect_notes"] = len(notes)
 
             translation = await self._stream_translation(
-                turn, source_text, src, dst, terms, notes, metrics, t_end
+                turn,
+                mt_input,
+                src,
+                dst,
+                terms,
+                region_name,
+                notes,
+                metrics,
+                t_end,
             )
 
             await self._send(
@@ -465,10 +563,14 @@ class ConsultSession:
                     "text": translation,
                 }
             )
-            self._remember(src, dst, source_text, translation)
+            # 이력에는 번역 모델이 실제로 본 문장을 남긴다. 사투리와 표준어가 섞이면
+            # 앞선 발화를 예시로 삼는 모델이 어느 쪽 문체를 따를지 흔들린다.
+            self._remember(src, dst, mt_input, translation)
 
             metrics["total_ms"] = int((time.perf_counter() - t_end) * 1000)
-            await self._record(turn, src, dst, source_text, translation, metrics)
+            await self._record(
+                turn, src, dst, source_text, translation, standard or "", metrics
+            )
             await self._send({"type": "turn_done", "turn": turn.id, "metrics": metrics})
         except asyncio.CancelledError:
             raise
@@ -485,6 +587,7 @@ class ConsultSession:
         src: str,
         dst: str,
         terms: list[tuple[str, str]],
+        dialect_region: str,
         dialect_notes: list[str],
         metrics: dict,
         t_end: float,
@@ -497,7 +600,7 @@ class ConsultSession:
             dst,
             self._history_for(src, dst),
             terms,
-            dialect_enabled=bool(self._dialect),
+            dialect_region=dialect_region,
             dialect_notes=dialect_notes,
         ):
             if first:
@@ -516,6 +619,7 @@ class ConsultSession:
         dst: str,
         original: str,
         translated: str,
+        standard: str,
         metrics: dict,
     ) -> None:
         self._recorded += 1
@@ -526,6 +630,7 @@ class ConsultSession:
             dst=dst,
             original=original,
             translated=translated,
+            standard=standard,
             metrics=metrics,
         )
         try:

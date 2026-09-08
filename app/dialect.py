@@ -1,4 +1,4 @@
-"""경상도(부산) 방언 지원.
+"""방언 대응표 — whisper 프롬프트와 뜻풀이 주석.
 
 표준어로 학습된 STT·번역 모델을 그대로 쓰면서 사투리를 알아듣게 하려는 장치다.
 방언은 두 군데에서 깨진다.
@@ -16,6 +16,12 @@
 잘못 걸려도 주석 한 줄이 군더더기로 붙을 뿐, 기사가 한 말 자체는 바뀌지 않는다.
 
 방언을 늘릴 때는 `data/dialect/<이름>.json` 만 고치면 된다.
+
+`notes()` 로 뜻만 알려 주는 이 방식은 이제 **폴백**이다. 평소에는 `jejuma.py` 가
+발화를 표준어로 옮기고 그 표준어를 번역한다. 게이트웨이가 닿지 않을 때만 여기로
+되돌아온다. 그래서 경상도 말고 네 지역의 대응표는 `prompt_lead` · `prompt_words` 만
+채우고 `endings`·`words` 를 비워 두었다. 받아쓰기를 사투리 표기로 붙드는 일은 어느
+경로에서도 필요하지만, 뜻풀이 정규식까지 다섯 지역 분량으로 쌓을 이유는 없다.
 """
 
 from __future__ import annotations
@@ -155,6 +161,11 @@ class Dialect:
 
     def __len__(self) -> int:
         return len(self._endings) + len(self._words)
+
+    @property
+    def prompt_terms(self) -> int:
+        """whisper 프롬프트에 들려줄 수 있는 표기 수. 뜻풀이가 없는 대응표도 이건 있다."""
+        return len(self._prompt_words)
 
     # -------------------------------------------------------------------- API
     def prompt(self, limit: int = 8) -> str:

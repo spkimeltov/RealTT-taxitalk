@@ -445,6 +445,32 @@ body:not([data-view="setup"]) .notice { display: none; }
 }
 .secondary:empty { display: none; }
 
+/* 사투리를 표준어로 옮긴 문장. 기사가 하신 말씀은 위에 그대로 두고, 번역이 무엇을
+   보고 나왔는지만 아래에 덧붙인다. 원문과 헷갈리지 않도록 앞에 딱지를 붙이고
+   `.secondary` 보다 한 단계 더 작고 흐리게 둔다. */
+.standard {
+  margin-top: 8px;
+  padding-left: 10px;
+  border-left: 3px solid rgba(100, 116, 139, 0.3);
+  font-size: 15px;
+  line-height: 1.45;
+  color: #7c8899;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.standard::before {
+  content: '표준어';
+  display: inline-block;
+  margin-right: 7px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(100, 116, 139, 0.14);
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: 2px;
+}
+.standard[hidden] { display: none; }
+
 .bubble[data-status="listening"] .primary { color: #5b6b81; }
 .bubble[data-status="listening"] { border-style: dashed; }
 
@@ -556,6 +582,19 @@ body:not([data-view="setup"]) .notice { display: none; }
 .radio-row b { display: block; font-size: 14px; margin-bottom: 2px; }
 .radio-row span { color: var(--muted); }
 
+/* 사투리 사용 여부. `.field > label` 은 위에 놓이는 제목이라 블록인데, 여기서는
+   체크박스와 글이 한 줄에 붙어야 해서 따로 잡는다. */
+.field > label.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 9px;
+  cursor: pointer;
+}
+.field > label.check input { width: 16px; height: 16px; margin: 0; }
+.field select:disabled { background: #f1f4f8; color: var(--muted); }
+.field .hint { margin: 7px 0 0; font-size: 12px; line-height: 1.55; color: var(--muted); }
+
 /* ------------------------------------------------------------------ 토스트 */
 .toasts {
   position: fixed;
@@ -588,6 +627,7 @@ body[data-layout="dual"] .toasts { left: 25%; }
 @container (max-width: 1400px) {
   .primary { font-size: 25px; }
   .secondary { font-size: 16px; }
+  .standard { font-size: 14px; }
   .setup h1, .ended h1 { font-size: 28px; }
   .hero-title { font-size: 54px; }
   .hero-eyebrow { font-size: 17px; }
@@ -599,6 +639,7 @@ body[data-layout="dual"] .toasts { left: 25%; }
   .screen { --bar-h: 60px; }
   .primary { font-size: 21px; }
   .secondary { font-size: 15px; }
+  .standard { font-size: 13px; }
   .setup h1, .ended h1 { font-size: 24px; }
   .hero-title { font-size: 42px; }
   .hero-eyebrow { font-size: 15px; }
